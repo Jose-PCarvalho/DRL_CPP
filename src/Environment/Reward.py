@@ -9,7 +9,7 @@ class RewardParams:
         self.close_to_wall_reward = 1.0
         self.repeated_action_reward = 1.0
         self.finished_row_col = 1.0
-        self.map_complete = 50
+        self.map_complete = 25
         self.scaling_factor = scaling
 
 

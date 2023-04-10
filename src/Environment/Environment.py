@@ -59,5 +59,5 @@ class Environment:
         return len(Actions)
 
     def render(self):
-        self.viz.render_center(np.array(self.state.state_array).transpose((3, 0, 1, 2))[:, -1, :, :])
-        #self.viz.render_center(self.state.local_map.center_map(self.state.position.get_position()).transpose(2, 0, 1))
+        self.viz.render_center(np.array(self.state.state_array)[-1,:, :, :])
+        #self.viz.render_center(self.state.local_map.center_map(self.stateposition.get_position()).transpose(2, 0, 1))

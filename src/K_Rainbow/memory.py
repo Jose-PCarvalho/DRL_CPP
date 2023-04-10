@@ -4,9 +4,9 @@ import numpy as np
 import torch
 
 Transition_dtype = np.dtype(
-    [('timestep', np.int32), ('state', np.uint8, (3, 9, 9)), ('action', np.int32), ('reward', np.float32),
+    [('timestep', np.int32), ('state', np.uint8, (4, 9, 9)), ('action', np.int32), ('reward', np.float32),
      ('nonterminal', np.bool_)])
-blank_trans = (0, np.zeros((3, 9, 9), dtype=np.uint8), 0, 0.0, False)
+blank_trans = (0, np.zeros((4, 9, 9), dtype=np.uint8), 0, 0.0, False)
 
 
 

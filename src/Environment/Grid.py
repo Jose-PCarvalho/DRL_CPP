@@ -68,42 +68,24 @@ class GridMap:
     def visit_tile(self, tile):
         if tile not in self.visited_list:
             self.visited_list.append(tile)
-            self.map_array[tile[0], tile[1], :] = [255, 0, 0]
+            self.map_array[:, tile[0], tile[1]] = [1, 0, 0, 0]
 
     def graph_to_array(self):
-        a = np.zeros((self.height, self.width, 3),
+        a = np.zeros((4, self.height, self.width),
                      dtype=np.uint8)  # 0 -> visited , #1 ->non-visited, #2 -> obstacles 3->not-seen
         for i in range(self.height):
             for j in range(self.width):
                 tile = (i, j)
                 if tile in self.visited_list:
-                    a[i, j, 0] = 255
+                    a[0, i, j] = 1
                 elif tile in (self.getTiles()) and tile not in (set(self.visited_list).union(set(self.obstacle_list))):
-                    a[i, j, :] = [255, 255, 255]
+                    a[1, i, j] = 1
                 elif tile in self.obstacle_list:
-                    pass
+                    a[2, i, j] = 1
                 else:
-                    a[i, j, 2] = 255
+                    a[3, i, j] = 1
         return a
 
-    def graph_to_RGB_array(self):
-        rg = np.zeros((self.height, self.width, 2), dtype=bool)  # default True
-        b = np.ones((self.height, self.width), dtype=bool)
-        rgb = np.dstack((rg, b))
-
-        for tile in self.getTiles():
-
-            if tile in self.visited_list:  # RED
-                rgb[tile[0], tile[1], 0] = True
-                rgb[tile[0], tile[1], 2] = False
-
-            elif tile in self.obstacle_list:  # black
-                rgb[tile[0], tile[1], 0] = False
-                rgb[tile[0], tile[1], 1] = False
-                rgb[tile[0], tile[1], 2] = False
-
-        rgb = (rgb.astype(np.uint8) * 255).astype(np.uint8)
-        return rgb
 
     def laser_scanner(self, tile, full_map):
         r = 4
@@ -171,17 +153,17 @@ class GridMap:
         center_index = new_size // 2
 
         # create a new array of zeros with the desired size
-        new_arr = np.zeros((new_size, new_size, 3), dtype=np.uint8)
+        new_arr = np.zeros((4, new_size, new_size), dtype=np.uint8)
 
         # calculate the indices of the original array that should be copied to the new array
         start_i = center_index - position[0]
-        end_i = start_i + self.map_array.shape[0]
+        end_i = start_i + self.map_array.shape[1]
         start_j = center_index - position[1]
-        end_j = start_j + self.map_array.shape[1]
+        end_j = start_j + self.map_array.shape[2]
 
         # copy the original array to the center of the new array
-        new_arr[start_i:end_i, start_j:end_j, :] = self.map_array
+        new_arr[:, start_i:end_i, start_j:end_j] = self.map_array
 
-        #gray_scale = np.dot(new_arr, [0.299, 0.587, 0.114])
+        # gray_scale = np.dot(new_arr, [0.299, 0.587, 0.114])
 
         return new_arr

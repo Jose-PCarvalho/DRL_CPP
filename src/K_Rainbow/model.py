@@ -70,8 +70,8 @@ class DQN(nn.Module):
         #     self.convs = nn.Sequential(nn.Conv2d(3, 16, 5, stride=1, padding=0), nn.ReLU(),
         #                                nn.Conv2d(16, 16, 5, stride=1, padding=0), nn.ReLU())
         #     self.conv_output_size = self._get_conv_out([3, 19, 19])
-        self.fc_h_v = NoisyLinear(9*9*3 + 1, args.hidden_size, std_init=args.noisy_std)
-        self.fc_h_a = NoisyLinear(9*9*3 + 1, args.hidden_size, std_init=args.noisy_std)
+        self.fc_h_v = NoisyLinear(9*9*4, args.hidden_size, std_init=args.noisy_std)
+        self.fc_h_a = NoisyLinear(9*9*4, args.hidden_size, std_init=args.noisy_std)
         self.fc_z_v = NoisyLinear(args.hidden_size, self.atoms, std_init=args.noisy_std)
         self.fc_z_a = NoisyLinear(args.hidden_size, action_space * self.atoms, std_init=args.noisy_std)
 
@@ -83,7 +83,7 @@ class DQN(nn.Module):
         # x = x.reshape(x.size(0), -1, x.size(-2), x.size(-1))
         # x = self.convs(x)
         x = x.view(x.size(0), -1)
-        x = torch.cat((x, reamining), 1)
+        #x = torch.cat((x, reamining), 1)
         v = self.fc_z_v(F.relu(self.fc_h_v(x)))  # Value stream
         a = self.fc_z_a(F.relu(self.fc_h_a(x)))  # Advantage stream
         v, a = v.view(-1, 1, self.atoms), a.view(-1, self.action_space, self.atoms)

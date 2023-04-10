@@ -125,7 +125,7 @@ class State:
         self.remaining = height * width - 1 - obstacle_number
         self.optimal_steps = self.remaining
         self.timesteps = 0
-        self.t_to_go = self.params.size ** 2 * 10
+        self.t_to_go = self.params.size ** 2 * 20
         self.terminated = False
         self.truncated = False
         s = self.local_map.center_map(self.position.get_position())
@@ -134,7 +134,7 @@ class State:
     def get_observation(self):
         self.state_array.pop(0)
         self.state_array.append(self.local_map.center_map(self.position.get_position()))
-        return np.array(self.state_array).transpose((3,0,1,2))#self.local_map.center_map(self.position.get_position()).transpose(2, 0, 1)
+        return np.array(self.state_array)#self.local_map.center_map(self.position.get_position()).transpose(2, 0, 1)
 
     # self.local_map.center_map(self.position.get_position()).transpose(2, 0, 1)
 
