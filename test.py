@@ -23,12 +23,12 @@ def test(args, T, dqn, val_mem, metrics, results_dir, evaluate=False):
                 state, info = env.reset()
                 reward_sum, done, truncated = 0, False, False
 
-            action = dqn.act_e_greedy(state,env.state.t_to_go)  # Choose an action ε-greedily
+            action = dqn.act_e_greedy(state, env.state.t_to_go)  # Choose an action ε-greedily
             state, reward, done, truncated, info = env.step(action)  # Step
 
             reward_sum += reward
             if args.render:
-                 env.render()
+                env.render()
             if done or truncated:
                 T_rewards.append(reward_sum)
                 break
@@ -36,8 +36,8 @@ def test(args, T, dqn, val_mem, metrics, results_dir, evaluate=False):
     # env.close()
 
     # Test Q-values over validation memory
-    for state , timestep in val_mem:  # Iterate over valid states
-        T_Qs.append(dqn.evaluate_q(state,env.state.params.size**2*10-timestep[-1]))
+    for state in val_mem:  # Iterate over valid states
+        T_Qs.append(dqn.evaluate_q(state))
 
     avg_reward, avg_Q = sum(T_rewards) / len(T_rewards), sum(T_Qs) / len(T_Qs)
     if not evaluate:

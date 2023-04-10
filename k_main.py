@@ -31,7 +31,7 @@ parser.add_argument('--V-max', type=float, default=10, metavar='V', help='Maximu
 parser.add_argument('--model', type=str, metavar='PARAMS', help='Pretrained model (state dict)')
 parser.add_argument('--memory-capacity', type=int, default=int(50000), metavar='CAPACITY',
                     help='Experience replay memory capacity')
-parser.add_argument('--replay-frequency', type=int, default=1, metavar='k', help='Frequency of sampling from memory')
+parser.add_argument('--replay-frequency', type=int, default=4, metavar='k', help='Frequency of sampling from memory')
 parser.add_argument('--priority-exponent', type=float, default=0.5, metavar='ω',
                     help='Prioritised experience replay exponent (originally denoted α)')
 parser.add_argument('--priority-weight', type=float, default=0.4, metavar='β',
@@ -43,7 +43,7 @@ parser.add_argument('--target-update', type=int, default=int(2e3), metavar='τ',
 parser.add_argument('--reward-clip', type=int, default=1, metavar='VALUE', help='Reward clipping (0 to disable)')
 parser.add_argument('--learning-rate', type=float, default=0.0001, metavar='η', help='Learning rate')
 parser.add_argument('--adam-eps', type=float, default=1.5e-4, metavar='ε', help='Adam epsilon')
-parser.add_argument('--batch-size', type=int, default=64, metavar='SIZE', help='Batch size')
+parser.add_argument('--batch-size', type=int, default=32, metavar='SIZE', help='Batch size')
 parser.add_argument('--norm-clip', type=float, default=10, metavar='NORM', help='Max L2 norm for gradient clipping')
 parser.add_argument('--learn-start', type=int, default=int(10e3), metavar='STEPS',
                     help='Number of steps before starting training')
@@ -133,7 +133,7 @@ while T < args.evaluation_size:
     if done:
         state, info = env.reset()
 
-    next_state, _, done , truncated , info = env.step(np.random.randint(0, action_space))
+    next_state, _, done, truncated, info = env.step(np.random.randint(0, action_space))
     val_mem.append(state, -1, 0.0, done)
     state = next_state
     T += 1
@@ -147,16 +147,16 @@ else:
     dqn.train()
     done = True
     truncated = True
-    t=0
+    t = 0
     for T in trange(1, args.T_max + 1):
         if done or truncated:
-            t=0
+            t = 0
             state, _ = env.reset()
 
         if T % args.replay_frequency == 0:
             dqn.reset_noise()  # Draw a new set of noisy weights
 
-        action = dqn.act(state,env.state.t_to_go)  # Choose an action greedily (with noisy weights)
+        action = dqn.act(state)  # Choose an action greedily (with noisy weights)
 
         next_state, reward, done, truncated, info = env.step(action)  # Step
 
@@ -167,15 +167,17 @@ else:
 
         # Train and test
         if T >= args.learn_start:
-            mem.priority_weight = min(mem.priority_weight + priority_weight_increase, 1)  # Anneal importance sampling weight β to 1
+            mem.priority_weight = min(mem.priority_weight + priority_weight_increase,
+                                      1)  # Anneal importance sampling weight β to 1
 
             if T % args.replay_frequency == 0:
-                dqn.learn(mem,env.state.params.size**2-10)  # Train with n-step distributional double-Q learning
+                dqn.learn(mem)  # Train with n-step distributional double-Q learning
 
             if T % args.evaluation_interval == 0:
                 dqn.eval()  # Set DQN (online network) to evaluation mode
                 avg_reward, avg_Q = test(args, T, dqn, val_mem, metrics, results_dir)  # Test
-                log('T = ' + str(T) + ' / ' + str(args.T_max) + ' | Avg. reward: ' + str(avg_reward) + ' | Avg. Q: ' + str(avg_Q))
+                log('T = ' + str(T) + ' / ' + str(args.T_max) + ' | Avg. reward: ' + str(
+                    avg_reward) + ' | Avg. Q: ' + str(avg_Q))
                 dqn.train()  # Set DQN (online network) back to training mode
 
                 # If memory path provided, save it

@@ -87,6 +87,8 @@ class State:
 
         self.last_action = action
         self.local_map.laser_scanner(self.position.get_position(), self.global_map)
+        self.state_array.pop(0)
+        self.state_array.append(self.local_map.center_map(self.position.get_position()))
         self.timesteps += 1
         self.t_to_go -= 1
         if self.t_to_go <= 0:
@@ -131,12 +133,4 @@ class State:
         s = self.local_map.center_map(self.position.get_position())
         self.state_array = [s, s, s, s]
 
-    def get_observation(self):
-        self.state_array.pop(0)
-        self.state_array.append(self.local_map.center_map(self.position.get_position()))
-        return np.array(self.state_array)#self.local_map.center_map(self.position.get_position()).transpose(2, 0, 1)
 
-    # self.local_map.center_map(self.position.get_position()).transpose(2, 0, 1)
-
-    def get_info(self):
-        return {}

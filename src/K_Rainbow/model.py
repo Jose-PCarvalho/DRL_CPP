@@ -79,7 +79,7 @@ class DQN(nn.Module):
         o = self.convs(torch.zeros(1, *shape))
         return int(np.prod(o.size()))
 
-    def forward(self, x, reamining, log=False):
+    def forward(self, x, log=False):
         # x = x.reshape(x.size(0), -1, x.size(-2), x.size(-1))
         # x = self.convs(x)
         x = x.view(x.size(0), -1)

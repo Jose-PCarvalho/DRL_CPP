@@ -23,41 +23,24 @@ class Environment:
     def reset(self):
         self.state.init_episode()
         self.rewards.reset(1 / self.state.params.size)
-        return self.state.get_observation(), self.state.get_info()
+        return self.get_observation(), self.get_info()
 
     def step(self, action):
         events = self.state.move_agent(Actions(action))
         reward = self.rewards.compute_reward(events)
-        return self.state.get_observation(), reward, self.state.terminated, self.state.truncated, self.state.get_info()
+        return self.get_observation(), reward, self.state.terminated, self.state.truncated, self.get_info()
 
-    def run(self):
-        # self.fill_replay_memory()
-
-        print('Running ')  # , self.stats.params.log_file_name)
-
-        bar = tqdm.tqdm(total=int(self.trainer.params.num_steps))
-        last_step = 0
-        while self.episode_count < self.trainer.params.num_steps:
-            bar.update(self.episode_count - last_step)
-            last_step = self.episode_count
-            self.train_episode()
-
-            if self.episode_count % self.trainer.params.eval_period == 0:
-                self.test_episode()
-
-            # self.stats.save_if_best()
-
-        # self.stats.training_ended()
-
-    def train_episode(self):
-        pass
-
-    def test_episode(self):
-        pass
 
     def action_space(self):
         return len(Actions)
 
     def render(self):
-        self.viz.render_center(np.array(self.state.state_array)[-1,:, :, :])
+        self.viz.render_center(self.get_observation()[-1,:, :, :])
         #self.viz.render_center(self.state.local_map.center_map(self.stateposition.get_position()).transpose(2, 0, 1))
+
+
+    def get_observation(self):
+        return np.array(self.state.state_array)
+
+    def get_info(self):
+        return {}
