@@ -16,6 +16,6 @@ while True:
         observation_, reward, done, truncated, info = env.step(random.choice(list(Actions)))
         print(reward)
         #print(env.state.remaining)
-        Viz.render_center(observation_)
+        env.render()
         if done or truncated:
             break

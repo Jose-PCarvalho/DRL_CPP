@@ -22,7 +22,7 @@ class StateParams:
         self.number_of_obstacles_random = False
         self.max_number_obstacles = 5
         self.obstacles_number_non_random = 0
-        self.starting_position_random = True
+        self.starting_position_random = False
         self.starting_position = (0, 0)
         self.random_size = False
         self.size = 5
@@ -36,10 +36,12 @@ class State:
         self.remaining = None
         self.last_action = None
         self.timesteps = None
+        self.t_to_go = None
         self.optimal_steps = None
         self.terminated = False
         self.truncated = False
         self.params = StateParams()
+        self.state_array = []
 
     def move_agent(self, action: Actions):
         events = []
@@ -78,6 +80,7 @@ class State:
             events.append(Events.NEW)
             if self.remaining <= 0:
                 self.terminated = True
+                events.append(Events.FINISHED)
 
         if action == self.last_action:
             events.append(Events.REPEATED)
@@ -85,8 +88,9 @@ class State:
         self.last_action = action
         self.local_map.laser_scanner(self.position.get_position(), self.global_map)
         self.timesteps += 1
-        if self.timesteps > self.params.size**2*10:
-            self.truncated=True
+        self.t_to_go -= 1
+        if self.t_to_go <= 0:
+            self.truncated = True
         return events
 
     def init_episode(self):
@@ -121,11 +125,18 @@ class State:
         self.remaining = height * width - 1 - obstacle_number
         self.optimal_steps = self.remaining
         self.timesteps = 0
+        self.t_to_go = self.params.size ** 2 * 10
         self.terminated = False
         self.truncated = False
+        s = self.local_map.center_map(self.position.get_position())
+        self.state_array = [s, s, s, s]
 
     def get_observation(self):
-        return self.local_map.center_map(self.position.get_position())
+        self.state_array.pop(0)
+        self.state_array.append(self.local_map.center_map(self.position.get_position()))
+        return np.array(self.state_array).transpose((3,0,1,2))#self.local_map.center_map(self.position.get_position()).transpose(2, 0, 1)
+
+    # self.local_map.center_map(self.position.get_position()).transpose(2, 0, 1)
 
     def get_info(self):
         return {}

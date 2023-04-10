@@ -19,7 +19,7 @@ target_update = 200
 
 env = Environment(EnvironmentParams())
 
-agent = DQNAgent([4, 9, 9], 4, memory_size, batch_size, target_update)
+agent = DQNAgent([1,9, 9], 4, memory_size, batch_size, target_update)
 
 n_steps = 0
 scores, eps_history, steps_array = [], [], []
@@ -35,7 +35,7 @@ while i < num_frames:
     while True:
         i += 1
         j += 1
-        action = agent.select_action(observation)
+        action = agent.select_action(observation[np.newaxis,:])
         observation_, reward, done, truncated, info = env.step(Actions(action))
         # if action==0:
         #     print(action)

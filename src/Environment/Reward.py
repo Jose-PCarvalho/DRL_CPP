@@ -3,12 +3,13 @@ from src.Environment.Actions import Events
 
 class RewardParams:
     def __init__(self, scaling):
-        self.blocked_reward = -1.0/10
-        self.repeated_field_reward = -1.0/10
-        self.new_tile_reward = 2.0
+        self.blocked_reward = -0.1
+        self.repeated_field_reward = -0.1
+        self.new_tile_reward = 1.0
         self.close_to_wall_reward = 1.0
         self.repeated_action_reward = 1.0
         self.finished_row_col = 1.0
+        self.map_complete = 50
         self.scaling_factor = scaling
 
 
@@ -22,7 +23,7 @@ class GridRewards:
 
     def reset(self, scaling):
         self.cumulative_reward = 0
-        self.params.scaling_factor = scaling
+        self.params.scaling_factor = scaling ** 2
 
     def compute_reward(self, events):
         r = 0
@@ -41,8 +42,10 @@ class GridRewards:
 
         else:
             r += self.params.repeated_field_reward * self.params.scaling_factor
-            if Events.BLOCKED in events:
+        if Events.BLOCKED in events:
                 r += self.params.blocked_reward * self.params.scaling_factor
+        if Events.FINISHED in events:
+            r += self.params.map_complete * self.params.scaling_factor
 
         self.cumulative_reward += r
 

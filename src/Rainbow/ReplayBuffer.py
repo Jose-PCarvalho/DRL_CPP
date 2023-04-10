@@ -35,6 +35,8 @@ class ReplayBuffer:
             next_obs: np.ndarray,
             done: bool,
     ) -> Tuple[np.ndarray, np.ndarray, float, np.ndarray, bool]:
+        obs=obs[np.newaxis,:]
+
         transition = (obs, act, rew, next_obs, done)
         self.n_step_buffer.append(transition)
 
@@ -47,7 +49,8 @@ class ReplayBuffer:
             self.n_step_buffer, self.gamma
         )
         obs, act = self.n_step_buffer[0][:2]
-
+        obs = obs[np.newaxis, :]
+        next_obs = next_obs[np.newaxis, :]
         self.obs_buf[self.ptr] = obs
         self.next_obs_buf[self.ptr] = next_obs
         self.acts_buf[self.ptr] = act

@@ -11,5 +11,6 @@ class Actions(Enum):
 class Events(Enum):
     BLOCKED = 0
     NEW = 1
-    REPEATED =2
+    REPEATED = 2
+    FINISHED = 3
 

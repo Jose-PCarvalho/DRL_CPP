@@ -2,13 +2,15 @@ from src.Environment.Reward import *
 from src.Environment.Actions import *
 from src.Environment.Grid import *
 from src.Environment.State import *
+from src.Environment.Actions import *
+from src.Environment.Vizualization import *
 import tqdm
 
 
 class EnvironmentParams:
     def __init__(self):
         self.state_params = StateParams()
-        self.reward_params = RewardParams(1/(self.state_params.size**2))
+        self.reward_params = RewardParams(1 / (self.state_params.size ** 2))
 
 
 class Environment:
@@ -16,6 +18,7 @@ class Environment:
         self.rewards = GridRewards(params.reward_params)
         self.state = State(params.state_params)
         self.episode_count = 0
+        self.viz = Vizualization()
 
     def reset(self):
         self.state.init_episode()
@@ -23,7 +26,7 @@ class Environment:
         return self.state.get_observation(), self.state.get_info()
 
     def step(self, action):
-        events = self.state.move_agent(action)
+        events = self.state.move_agent(Actions(action))
         reward = self.rewards.compute_reward(events)
         return self.state.get_observation(), reward, self.state.terminated, self.state.truncated, self.state.get_info()
 
@@ -51,3 +54,10 @@ class Environment:
 
     def test_episode(self):
         pass
+
+    def action_space(self):
+        return len(Actions)
+
+    def render(self):
+        self.viz.render_center(np.array(self.state.state_array).transpose((3, 0, 1, 2))[:, -1, :, :])
+        #self.viz.render_center(self.state.local_map.center_map(self.state.position.get_position()).transpose(2, 0, 1))
