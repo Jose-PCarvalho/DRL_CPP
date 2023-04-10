@@ -13,7 +13,6 @@ def test(args, T, dqn, val_mem, metrics, results_dir, evaluate=False):
     env = Environment(EnvironmentParams())
     metrics['steps'].append(T)
     T_rewards, T_Qs = [], []
-
     # Test performance over several episodes
     done = True
     truncated = False
@@ -23,14 +22,14 @@ def test(args, T, dqn, val_mem, metrics, results_dir, evaluate=False):
                 state, info = env.reset()
                 reward_sum, done, truncated = 0, False, False
 
-            action = dqn.act_e_greedy(state, env.state.t_to_go)  # Choose an action ε-greedily
+            action = dqn.act_e_greedy(state)  # Choose an action ε-greedily
             state, reward, done, truncated, info = env.step(action)  # Step
 
             reward_sum += reward
             if args.render:
                 env.render()
             if done or truncated:
-                T_rewards.append(reward_sum)
+                T_rewards.append(env.rewards.cumulative_reward)
                 break
 
     # env.close()

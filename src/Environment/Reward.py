@@ -9,8 +9,8 @@ class RewardParams:
         self.close_to_wall_reward = 1.0
         self.repeated_action_reward = 1.0
         self.finished_row_col = 1.0
-        self.map_complete = 25
-        self.scaling_factor = 1 #scaling
+        self.map_complete = 10
+        self.scaling_factor = scaling
 
 
 class GridRewards:
@@ -23,7 +23,7 @@ class GridRewards:
 
     def reset(self, scaling):
         self.cumulative_reward = 0
-        self.params.scaling_factor = scaling ** 2
+        self.params.scaling_factor = 1 #scaling ** 2
 
     def compute_reward(self, events):
         r = 0

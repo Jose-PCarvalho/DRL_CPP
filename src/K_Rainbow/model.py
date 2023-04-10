@@ -53,25 +53,26 @@ class DQN(nn.Module):
         self.atoms = args.atoms
         self.action_space = action_space
 
-        # if args.architecture == 'canonical':
-        #     # self.convs = nn.Sequential(nn.Conv2d(3, 32, 3, stride=2, padding=0), nn.ReLU(),  # stride 2
-        #     #                            nn.Conv2d(32, 64, 4, stride=4, padding=0), nn.ReLU(),
-        #     #                            nn.Conv2d(64, 64, 3, stride=1, padding=0), nn.ReLU())
-        #     self.convs = nn.Sequential(
-        #                                 nn.Conv2d(12, 32, kernel_size=3, stride=1),
-        #                                 nn.ReLU(),
-        #                                 nn.Conv2d(32, 64, kernel_size=3, stride=1),
-        #                                 nn.ReLU(),
-        #                                 nn.MaxPool2d(kernel_size=2, stride=2),
-        #                                 nn.Conv2d(64, 64, kernel_size=3, stride=1),
-        #                                 nn.ReLU())
-        #     self.conv_output_size = self._get_conv_out([12, 19, 19])
-        # elif args.architecture == 'data-efficient':
-        #     self.convs = nn.Sequential(nn.Conv2d(3, 16, 5, stride=1, padding=0), nn.ReLU(),
-        #                                nn.Conv2d(16, 16, 5, stride=1, padding=0), nn.ReLU())
-        #     self.conv_output_size = self._get_conv_out([3, 19, 19])
-        self.fc_h_v = NoisyLinear(9*9*4, args.hidden_size, std_init=args.noisy_std)
-        self.fc_h_a = NoisyLinear(9*9*4, args.hidden_size, std_init=args.noisy_std)
+        if args.architecture == 'canonical':
+            # self.convs = nn.Sequential(nn.Conv2d(3, 32, 3, stride=2, padding=0), nn.ReLU(),  # stride 2
+            #                            nn.Conv2d(32, 64, 4, stride=4, padding=0), nn.ReLU(),
+            #                            nn.Conv2d(64, 64, 3, stride=1, padding=0), nn.ReLU())
+            self.convs = nn.Sequential(
+                                        nn.Conv2d(12, 32, kernel_size=3, stride=1),
+                                        nn.ReLU(),
+                                        nn.Conv2d(32, 64, kernel_size=3, stride=1),
+                                        nn.ReLU(),
+                                        nn.MaxPool2d(kernel_size=2, stride=2),
+                                        nn.Conv2d(64, 64, kernel_size=3, stride=1),
+                                        nn.ReLU())
+            self.conv_output_size = self._get_conv_out([12, 19, 19])
+        elif args.architecture == 'data-efficient':
+            self.convs = nn.Sequential(nn.Conv2d(4, 32, 3, stride=1, padding='same'), nn.ReLU(),
+                                       nn.Conv2d(32, 64, 4, stride=1, padding=0), nn.ReLU(),
+                                       nn.Conv2d(64, 64, 3, stride=1, padding=0), nn.ReLU())
+            self.conv_output_size = self._get_conv_out([4,9,9])
+        self.fc_h_v = NoisyLinear(self.conv_output_size, args.hidden_size, std_init=args.noisy_std)
+        self.fc_h_a = NoisyLinear(self.conv_output_size, args.hidden_size, std_init=args.noisy_std)
         self.fc_z_v = NoisyLinear(args.hidden_size, self.atoms, std_init=args.noisy_std)
         self.fc_z_a = NoisyLinear(args.hidden_size, action_space * self.atoms, std_init=args.noisy_std)
 
@@ -80,8 +81,8 @@ class DQN(nn.Module):
         return int(np.prod(o.size()))
 
     def forward(self, x, log=False):
-        # x = x.reshape(x.size(0), -1, x.size(-2), x.size(-1))
-        # x = self.convs(x)
+        x = x.reshape(x.size(0), -1, x.size(-2), x.size(-1))
+        x = self.convs(x)
         x = x.view(x.size(0), -1)
         #x = torch.cat((x, reamining), 1)
         v = self.fc_z_v(F.relu(self.fc_h_v(x)))  # Value stream
