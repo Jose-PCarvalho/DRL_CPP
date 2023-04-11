@@ -19,7 +19,7 @@ parser.add_argument('--id', type=str, default='CPP', help='Experiment ID')
 parser.add_argument('--disable-cuda', action='store_true', help='Disable CUDA')
 parser.add_argument('--T-max', type=int, default=int(50e4), metavar='STEPS',
                     help='Number of training steps (4x number of frames)')
-parser.add_argument('--history-length', type=int, default=1, metavar='T', help='Number of consecutive states processed')
+parser.add_argument('--history-length', type=int, default=4, metavar='T', help='Number of consecutive states processed')
 parser.add_argument('--architecture', type=str, default='data-efficient', choices=['canonical', 'data-efficient'],
                     metavar='ARCH', help='Network architecture')
 parser.add_argument('--hidden-size', type=int, default=512, metavar='SIZE', help='Network hidden size')
@@ -111,7 +111,7 @@ env = Environment(EnvironmentParams())
 action_space = env.action_space()
 dqn = Agent(args, env)
 
-#If a model is provided, and evaluate is false, presumably we want to resume, so try to load memory
+# If a model is provided, and evaluate is false, presumably we want to resume, so try to load memory
 if args.model is not None and not args.evaluate:
     if not args.memory:
         raise ValueError('Cannot resume training without memory save path. Aborting...')
@@ -134,7 +134,7 @@ while T < args.evaluation_size:
         state, info = env.reset()
 
     next_state, _, done, truncated, info = env.step(np.random.randint(0, action_space))
-    val_mem.append(state, -1, 0.0, done)
+    val_mem.append(state[0], state[1], -1, 0.0, done or truncated)
     state = next_state
     T += 1
 
@@ -156,14 +156,14 @@ else:
         if T % args.replay_frequency == 0:
             dqn.reset_noise()  # Draw a new set of noisy weights
 
-        action = dqn.act(state)  # Choose an action greedily (with noisy weights)
+        action = dqn.act(state[0], state[1])  # Choose an action greedily (with noisy weights)
 
         next_state, reward, done, truncated, info = env.step(action)  # Step
 
         # if args.reward_clip > 0:
         #     reward = max(min(reward, args.reward_clip), -args.reward_clip)  # Clip rewards
 
-        mem.append(state, action, reward, done or truncated)  # Append transition to memory
+        mem.append(state[0], state[1], action, reward, done or truncated)  # Append transition to memory
 
         # Train and test
         if T >= args.learn_start:

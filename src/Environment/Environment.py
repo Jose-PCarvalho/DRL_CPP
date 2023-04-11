@@ -35,12 +35,12 @@ class Environment:
         return len(Actions)
 
     def render(self):
-        self.viz.render_center(self.get_observation()[-1,:, :, :])
+        self.viz.render_center(self.get_observation()[0][-1,:, :, :])
         #self.viz.render_center(self.state.local_map.center_map(self.stateposition.get_position()).transpose(2, 0, 1))
 
 
     def get_observation(self):
-        return np.array(self.state.state_array)
+        return (np.array(self.state.state_array),self.state.t_to_go)
 
     def get_info(self):
         return {}

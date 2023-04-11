@@ -52,31 +52,34 @@ class Agent:
         self.online_net.reset_noise()
 
     # Acts based on single state (no batch)
-    def act(self, state):
+    def act(self, state, battery):
         with torch.no_grad():
-            state = torch.tensor(state[-1], dtype=torch.float32, device='cuda')
-            return (self.online_net(state.unsqueeze(0)) * self.support).sum(2).argmax(1).item()
+            # state = torch.tensor(state[-1], dtype=torch.float32, device='cuda')
+            state = torch.tensor(state, dtype=torch.float32, device='cuda')
+            battery = torch.tensor(battery, dtype=torch.int32, device='cuda')
+            return (self.online_net(state.unsqueeze(0), battery.unsqueeze(0)) * self.support).sum(2).argmax(1).item()
 
     # Acts with an ε-greedy policy (used for evaluation only)
-    def act_e_greedy(self, state, epsilon=0.00001):  # High ε can reduce evaluation scores drastically
-        return np.random.randint(0, self.action_space) if np.random.random() < epsilon else self.act(state)
+    def act_e_greedy(self, state, battery, epsilon=0.00001):  # High ε can reduce evaluation scores drastically
+        return np.random.randint(0, self.action_space) if np.random.random() < epsilon else self.act(state, battery)
 
     def learn(self, mem):
         # Sample transitions
-        idxs, states, actions, returns, next_states, nonterminals, weights = mem.sample(self.batch_size)
+        idxs, states, actions, returns, next_states, nonterminals, weights, battery, next_battery = mem.sample(
+            self.batch_size)
 
         # Calculate current state probabilities (online network noise already sampled)
-        log_ps = self.online_net(states, log=True)  # Log probabilities log p(s_t, ·; θonline)
+        log_ps = self.online_net(states, battery, log=True)  # Log probabilities log p(s_t, ·; θonline)
         log_ps_a = log_ps[range(self.batch_size), actions]  # log p(s_t, a_t; θonline)
 
         with torch.no_grad():
             # Calculate nth next state probabilities
-            pns = self.online_net(next_states)  # Probabilities p(s_t+n, ·; θonline)
+            pns = self.online_net(next_states, next_battery)  # Probabilities p(s_t+n, ·; θonline)
             dns = self.support.expand_as(pns) * pns  # Distribution d_t+n = (z, p(s_t+n, ·; θonline))
             argmax_indices_ns = dns.sum(2).argmax(
                 1)  # Perform argmax action selection using online network: argmax_a[(z, p(s_t+n, a; θonline))]
             self.target_net.reset_noise()  # Sample new target net noise
-            pns = self.target_net(next_states)  # Probabilities p(s_t+n, ·; θtarget)
+            pns = self.target_net(next_states, next_battery)  # Probabilities p(s_t+n, ·; θtarget)
             pns_a = pns[range(
                 self.batch_size), argmax_indices_ns]  # Double-Q probabilities p(s_t+n, argmax_a[(z, p(s_t+n, a; θonline))]; θtarget)
 
@@ -116,9 +119,9 @@ class Agent:
         torch.save(self.online_net.state_dict(), os.path.join(path, name))
 
     # Evaluates Q-value based on single state (no batch)
-    def evaluate_q(self, state):
+    def evaluate_q(self, state, battery):
         with torch.no_grad():
-            return (self.online_net(state.unsqueeze(0)) * self.support).sum(2).max(1)[0].item()
+            return (self.online_net(state.unsqueeze(0), battery.unsqueeze(0)) * self.support).sum(2).max(1)[0].item()
 
     def train(self):
         self.online_net.train()

@@ -2,10 +2,14 @@ from __future__ import division
 import numpy as np
 import torch
 
+# State_dtype = np.dtype([('frames', np.uint8, (4, 9, 9)), ('battery', np.int64)])
+# blank_state = (np.zeros((4, 9, 9), dtype=np.uint8), 0)
+
 Transition_dtype = np.dtype(
-    [('timestep', np.int32), ('state', np.uint8, (4, 9, 9)), ('action', np.int32), ('reward', np.float32),
+    [('timestep', np.int32), ('state', np.uint8, (4, 49, 49)), ('battery', np.int32), ('action', np.int32),
+     ('reward', np.float32),
      ('nonterminal', np.bool_)])
-blank_trans = (0, np.zeros((4, 9, 9), dtype=np.uint8), 0, 0.0, False)
+blank_trans = (0, np.zeros((4, 49, 49), dtype=np.uint8), 0, 0, 0.0, False)
 
 
 # Segment tree data structure where parent node values are sum/max of children node values
@@ -107,9 +111,10 @@ class ReplayMemory():
             capacity)  # Store transitions in a wrap-around cyclic buffer within a sum tree for querying priorities
 
     # Adds state and action at time t, reward and terminal at time t + 1
-    def append(self, state, action, reward, terminal):
+    def append(self, state, battery, action, reward, terminal):
         state = torch.tensor(state[-1], dtype=torch.uint8, device=torch.device('cpu'))
-        self.transitions.append((self.t, state, action, reward, not terminal),
+        battery = torch.tensor(battery, dtype=torch.int32, device=torch.device('cpu'))
+        self.transitions.append((self.t, state, battery, action, reward, not terminal),
                                 self.transitions.max)  # Store new transition with maximum priority
         self.t = 0 if terminal else self.t + 1  # Start new episodes with t = 0
 
@@ -144,11 +149,16 @@ class ReplayMemory():
         # Retrieve all required transition data (from t - h to t + n)
         transitions = self._get_transitions(idxs)
         # Create un-discretised states and nth next states
+
         all_states = transitions['state']
+        all_batteries = transitions['battery']
         states = torch.tensor(all_states[:, :self.history], device=self.device, dtype=torch.float32)
         next_states = torch.tensor(all_states[:, self.n:self.n + self.history], device=self.device,
-                                   dtype=torch.float32)
-        # Discrete actions to be used as index
+                                   dtype=torch.float32)  # Discrete actions to be used as index
+
+        battery = torch.tensor(all_batteries[:, self.history - 1], device=self.device, dtype=torch.int32)
+        next_battery = torch.tensor(all_batteries[:, -1], device=self.device, dtype=torch.int32)
+
         actions = torch.tensor(np.copy(transitions['action'][:, self.history - 1]), dtype=torch.int64,
                                device=self.device)
         # Calculate truncated n-step discounted returns R^n = Σ_k=0->n-1 (γ^k)R_t+k+1 (note that invalid nth next states have reward 0)
@@ -158,18 +168,18 @@ class ReplayMemory():
         # Mask for non-terminal nth next states
         nonterminals = torch.tensor(np.expand_dims(transitions['nonterminal'][:, self.history + self.n - 1], axis=1),
                                     dtype=torch.float32, device=self.device)
-        return probs, idxs, tree_idxs, states, actions, R, next_states, nonterminals
+        return probs, idxs, tree_idxs, states, actions, R, next_states, nonterminals, battery, next_battery
 
     def sample(self, batch_size):
         p_total = self.transitions.total()  # Retrieve sum of all priorities (used to create a normalised probability distribution)
-        probs, idxs, tree_idxs, states, actions, returns, next_states, nonterminals = self._get_samples_from_segments(
+        probs, idxs, tree_idxs, states, actions, returns, next_states, nonterminals, battery, next_battery = self._get_samples_from_segments(
             batch_size, p_total)  # Get batch of valid samples
         probs = probs / p_total  # Calculate normalised probabilities
         capacity = self.capacity if self.transitions.full else self.transitions.index
         weights = (capacity * probs) ** -self.priority_weight  # Compute importance-sampling weights w
         weights = torch.tensor(weights / weights.max(), dtype=torch.float32,
                                device=self.device)  # Normalise by max importance-sampling weight from batch
-        return tree_idxs, states, actions, returns, next_states, nonterminals, weights
+        return tree_idxs, states, actions, returns, next_states, nonterminals, weights, battery, next_battery
 
     def update_priorities(self, idxs, priorities):
         priorities = np.power(priorities, self.priority_exponent)
@@ -193,7 +203,10 @@ class ReplayMemory():
         transitions[blank_mask] = blank_trans
         state = torch.tensor(transitions['state'], dtype=torch.float32,
                              device=self.device)  # Agent will turn into batch
+        b=transitions['battery']
+        battery = torch.tensor(transitions['battery'][-1], dtype=torch.int32,
+                               device=self.device)  # Agent will turn into batch
         self.current_idx += 1
-        return state
+        return state, battery
 
     next = __next__  # Alias __next__ for Python 2 compatibility

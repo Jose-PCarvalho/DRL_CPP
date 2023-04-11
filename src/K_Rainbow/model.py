@@ -58,21 +58,21 @@ class DQN(nn.Module):
             #                            nn.Conv2d(32, 64, 4, stride=4, padding=0), nn.ReLU(),
             #                            nn.Conv2d(64, 64, 3, stride=1, padding=0), nn.ReLU())
             self.convs = nn.Sequential(
-                                        nn.Conv2d(12, 32, kernel_size=3, stride=1),
-                                        nn.ReLU(),
-                                        nn.Conv2d(32, 64, kernel_size=3, stride=1),
-                                        nn.ReLU(),
-                                        nn.MaxPool2d(kernel_size=2, stride=2),
-                                        nn.Conv2d(64, 64, kernel_size=3, stride=1),
-                                        nn.ReLU())
-            self.conv_output_size = self._get_conv_out([12, 19, 19])
+                nn.Conv2d(12, 32, kernel_size=3, stride=1),
+                nn.ReLU(),
+                nn.Conv2d(32, 64, kernel_size=3, stride=1),
+                nn.ReLU(),
+                nn.MaxPool2d(kernel_size=2, stride=2),
+                nn.Conv2d(64, 64, kernel_size=3, stride=1),
+                nn.ReLU())
+            self.conv_output_size = self._get_conv_out([12, 49, 49])
         elif args.architecture == 'data-efficient':
-            self.convs = nn.Sequential(nn.Conv2d(4, 32, 3, stride=1, padding='same'), nn.ReLU(),
+            self.convs = nn.Sequential(nn.Conv2d(16, 32, 3, stride=1, padding='same'), nn.ReLU(),
                                        nn.Conv2d(32, 64, 4, stride=1, padding=0), nn.ReLU(),
                                        nn.Conv2d(64, 64, 3, stride=1, padding=0), nn.ReLU())
-            self.conv_output_size = self._get_conv_out([4,9,9])
-        self.fc_h_v = NoisyLinear(self.conv_output_size, args.hidden_size, std_init=args.noisy_std)
-        self.fc_h_a = NoisyLinear(self.conv_output_size, args.hidden_size, std_init=args.noisy_std)
+            self.conv_output_size = self._get_conv_out([16, 49, 49])
+        self.fc_h_v = NoisyLinear(self.conv_output_size + 1, args.hidden_size, std_init=args.noisy_std)
+        self.fc_h_a = NoisyLinear(self.conv_output_size + 1, args.hidden_size, std_init=args.noisy_std)
         self.fc_z_v = NoisyLinear(args.hidden_size, self.atoms, std_init=args.noisy_std)
         self.fc_z_a = NoisyLinear(args.hidden_size, action_space * self.atoms, std_init=args.noisy_std)
 
@@ -80,11 +80,12 @@ class DQN(nn.Module):
         o = self.convs(torch.zeros(1, *shape))
         return int(np.prod(o.size()))
 
-    def forward(self, x, log=False):
+    def forward(self, x, b, log=False):
+        b = b.view(-1, 1)
         x = x.reshape(x.size(0), -1, x.size(-2), x.size(-1))
         x = self.convs(x)
         x = x.view(x.size(0), -1)
-        #x = torch.cat((x, reamining), 1)
+        x = torch.cat((x, b), 1)
         v = self.fc_z_v(F.relu(self.fc_h_v(x)))  # Value stream
         a = self.fc_z_a(F.relu(self.fc_h_a(x)))  # Advantage stream
         v, a = v.view(-1, 1, self.atoms), a.view(-1, self.action_space, self.atoms)

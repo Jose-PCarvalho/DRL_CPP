@@ -148,7 +148,7 @@ class GridMap:
         return ranges
 
     def center_map(self, position):
-        new_size = 9
+        new_size = 49
         # calculate the center index of the new array
         center_index = new_size // 2
 
