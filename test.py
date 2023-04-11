@@ -29,7 +29,7 @@ def test(args, T, dqn, val_mem, metrics, results_dir, evaluate=False):
             if args.render:
                 env.render()
             if done or truncated:
-                T_rewards.append(env.rewards.cumulative_reward)
+                T_rewards.append(env.rewards.get_cumulative_reward())
                 break
 
     # env.close()

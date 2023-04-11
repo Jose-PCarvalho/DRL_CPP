@@ -23,7 +23,7 @@ parser.add_argument('--history-length', type=int, default=1, metavar='T', help='
 parser.add_argument('--architecture', type=str, default='data-efficient', choices=['canonical', 'data-efficient'],
                     metavar='ARCH', help='Network architecture')
 parser.add_argument('--hidden-size', type=int, default=512, metavar='SIZE', help='Network hidden size')
-parser.add_argument('--noisy-std', type=float, default=0.1, metavar='σ',
+parser.add_argument('--noisy-std', type=float, default=0.5, metavar='σ',
                     help='Initial standard deviation of noisy linear layers')
 parser.add_argument('--atoms', type=int, default=51, metavar='C', help='Discretised size of value distribution')
 parser.add_argument('--V-min', type=float, default=-50, metavar='V', help='Minimum of value distribution support')
@@ -36,7 +36,7 @@ parser.add_argument('--priority-exponent', type=float, default=0.5, metavar='ω'
                     help='Prioritised experience replay exponent (originally denoted α)')
 parser.add_argument('--priority-weight', type=float, default=0.4, metavar='β',
                     help='Initial prioritised experience replay importance sampling weight')
-parser.add_argument('--multi-step', type=int, default=3, metavar='n', help='Number of steps for multi-step return')
+parser.add_argument('--multi-step', type=int, default=20, metavar='n', help='Number of steps for multi-step return')
 parser.add_argument('--discount', type=float, default=0.99, metavar='γ', help='Discount factor')
 parser.add_argument('--target-update', type=int, default=int(8e3), metavar='τ',
                     help='Number of steps after which to update target network')
@@ -111,17 +111,17 @@ env = Environment(EnvironmentParams())
 action_space = env.action_space()
 dqn = Agent(args, env)
 
-# If a model is provided, and evaluate is false, presumably we want to resume, so try to load memory
-# if args.model is not None and not args.evaluate:
-#     if not args.memory:
-#         raise ValueError('Cannot resume training without memory save path. Aborting...')
-#     elif not os.path.exists(args.memory):
-#         raise ValueError('Could not find memory file at {path}. Aborting...'.format(path=args.memory))
-#
-#     mem = load_memory(args.memory, args.disable_bzip_memory)
-#
-# else:
-mem = ReplayMemory(args, args.memory_capacity)
+#If a model is provided, and evaluate is false, presumably we want to resume, so try to load memory
+if args.model is not None and not args.evaluate:
+    if not args.memory:
+        raise ValueError('Cannot resume training without memory save path. Aborting...')
+    elif not os.path.exists(args.memory):
+        raise ValueError('Could not find memory file at {path}. Aborting...'.format(path=args.memory))
+
+    mem = load_memory(args.memory, args.disable_bzip_memory)
+
+else:
+    mem = ReplayMemory(args, args.memory_capacity)
 
 priority_weight_increase = (1 - args.priority_weight) / (args.T_max - args.learn_start)
 
