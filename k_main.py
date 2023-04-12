@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser(description='Rainbow')
 parser.add_argument('--seed', type=int, default=123, help='Random seed')
 parser.add_argument('--id', type=str, default='CPP', help='Experiment ID')
 parser.add_argument('--disable-cuda', action='store_true', help='Disable CUDA')
-parser.add_argument('--T-max', type=int, default=int(50e4), metavar='STEPS',
+parser.add_argument('--T-max', type=int, default=int(70e4), metavar='STEPS',
                     help='Number of training steps (4x number of frames)')
 parser.add_argument('--history-length', type=int, default=4, metavar='T', help='Number of consecutive states processed')
 parser.add_argument('--architecture', type=str, default='data-efficient', choices=['canonical', 'data-efficient'],
@@ -50,7 +50,7 @@ parser.add_argument('--learn-start', type=int, default=int(10e3), metavar='STEPS
 parser.add_argument('--evaluate', action='store_true', help='Evaluate only')
 parser.add_argument('--evaluation-interval', type=int, default=10000, metavar='STEPS',
                     help='Number of training steps between evaluations')
-parser.add_argument('--evaluation-episodes', type=int, default=10, metavar='N',
+parser.add_argument('--evaluation-episodes', type=int, default=2, metavar='N',
                     help='Number of evaluation episodes to average over')
 # TODO: Note that DeepMind's evaluation method is running the latest agent for 500K frames ever every 1M steps
 parser.add_argument('--evaluation-size', type=int, default=250, metavar='N',

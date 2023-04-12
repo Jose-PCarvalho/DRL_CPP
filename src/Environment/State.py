@@ -21,8 +21,8 @@ class StateParams:
         self.obstacles = True
         self.number_of_obstacles_random = False
         self.max_number_obstacles = 5
-        self.obstacles_number_non_random = 0
-        self.starting_position_random = False
+        self.obstacles_number_non_random = 1
+        self.starting_position_random = True
         self.starting_position = (0, 0)
         self.random_size = False
         self.size = 5
