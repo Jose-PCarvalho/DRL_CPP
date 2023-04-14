@@ -154,7 +154,7 @@ class GridMap:
 
         # create a new array of zeros with the desired size
         new_arr = np.zeros((4, new_size, new_size), dtype=np.uint8)
-
+        new_arr[2,:,:]=1
         # calculate the indices of the original array that should be copied to the new array
         start_i = center_index - position[0]
         end_i = start_i + self.map_array.shape[1]

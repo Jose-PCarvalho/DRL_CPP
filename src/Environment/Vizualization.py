@@ -107,10 +107,10 @@ class Vizualization:
             self.window = pygame.display.set_mode((self.window_size, self.window_size))
         if self.clock is None:
             self.clock = pygame.time.Clock()
-        a=graph_to_RGB_array(a_)
+        a = graph_to_RGB_array(a_)
         size = a.shape[1]
         canvas = pygame.Surface((self.window_size, self.window_size))
-        canvas.fill((0, 0, 0))
+        canvas.fill((0, 255, 0))
         pix_square_size = (
                 self.window_size / size
         )  # The size of a single grid square in pixels
@@ -159,16 +159,16 @@ class Vizualization:
 
 
 def graph_to_RGB_array(a):
-    rgb = np.zeros((3,a.shape[1], a.shape[2]), dtype=np.uint8)
+    rgb = -1 * np.ones((3, a.shape[1], a.shape[2]), dtype=np.uint8)
 
     for i in range(a.shape[1]):
         for j in range(a.shape[2]):
             if a[0, i, j] == 1:
-                rgb[0, i, j] = 255
+                rgb[:, i, j] = [255, 0, 0]
             elif a[1, i, j] == 1:
                 rgb[:, i, j] = [255, 255, 255]
             elif a[2, i, j] == 1:
-                pass
+                rgb[:, i, j] = [0, 0, 0]
             elif a[3, i, j] == 1:
-                rgb[2, i, j] = 255
+                rgb[:, i, j] = [0, 0, 255]
     return rgb

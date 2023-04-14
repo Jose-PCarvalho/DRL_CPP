@@ -18,7 +18,7 @@ class StateParams:
     def __init__(self):
         self.max_size = 10
         self.min_size = 5
-        self.obstacles = True
+        self.obstacles = False
         self.number_of_obstacles_random = False
         self.max_number_obstacles = 5
         self.obstacles_number_non_random = 1
@@ -124,6 +124,7 @@ class State:
                     obstacles += 1
         self.global_map = GridMap(mapa)
         self.local_map = GridMap(start=self.position.get_position())
+        self.local_map.laser_scanner(self.position.get_position(), self.global_map)
         self.remaining = height * width - 1 - obstacle_number
         self.optimal_steps = self.remaining
         self.timesteps = 0
