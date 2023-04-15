@@ -25,16 +25,16 @@ class BackForth:
                         self.assign_actions()
 
         if len(self.wall_list) == 2:
-            a = self.action_seq[self.counter % len(self.action_seq)]
+            a = self.action_seq[self.counter]
             if self.counter == 1 or self.counter == 3:
                 self.counter += 1
-            if (a == Actions.NORTH and obs[2][self.north]) or (a == Actions.SOUTH and obs[2][self.south]) or \
+            elif (a == Actions.NORTH and obs[2][self.north]) or (a == Actions.SOUTH and obs[2][self.south]) or \
                     (a == Actions.EAST and obs[2][self.east]) or (a == Actions.WEST and obs[2][self.west]):
                 self.counter += 1
         if self.counter > 3:
             self.counter = 0
-        action = self.action_seq[self.counter % len(self.action_seq)]
-        print(action, self.counter % len(self.action_seq))
+        action = self.action_seq[self.counter]
+        print(action, self.counter)
         return action
 
     def init(self, obs):

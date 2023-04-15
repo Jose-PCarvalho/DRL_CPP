@@ -5,7 +5,7 @@ import torch
 from torch import optim
 from torch.nn.utils import clip_grad_norm_
 
-from src.K_Rainbow.model import DQN
+from src.Rainbow.model import DQN
 
 
 class Agent:

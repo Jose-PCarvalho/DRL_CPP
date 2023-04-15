@@ -15,17 +15,15 @@ class Position:
 
 
 class StateParams:
-    def __init__(self):
-        self.max_size = 10
-        self.min_size = 5
-        self.obstacles = False
-        self.number_of_obstacles_random = False
-        self.max_number_obstacles = 5
-        self.obstacles_number_non_random = 1
-        self.starting_position_random = True
-        self.starting_position = (0, 0)
-        self.random_size = False
-        self.size = 5
+    def __init__(self, args):
+        self.full_information = args['full_information']
+        self.size = args['size']
+        self.min_size = args['min_size']
+        self.random_size = args['random_size']
+        self.obstacles_random = args['obstacles_random']
+        self.number_obstacles = args['number_obstacles']
+        self.starting_position_random = args['starting_position_random']
+        self.starting_position = args['starting_position']
 
 
 class State:
@@ -40,7 +38,7 @@ class State:
         self.optimal_steps = None
         self.terminated = False
         self.truncated = False
-        self.params = StateParams()
+        self.params = Params
         self.state_array = []
 
     def move_agent(self, action: Actions):
@@ -97,7 +95,7 @@ class State:
 
     def init_episode(self):
         if self.params.random_size:
-            width = random.randint(4, 10)
+            width = random.randint(self.params.min_size, self.params.size)
             height = width
         else:
             width = self.params.size
@@ -112,18 +110,22 @@ class State:
 
         obstacles = 0
         obstacle_number = 0
-        if self.params.obstacles:
-            if self.params.number_of_obstacles_random:
-                obstacle_number = random.randint(0, self.params.max_number_obstacles)
+        if self.params.number_obstacles > 0:
+            if self.params.obstacles_random:
+                obstacle_number = random.randint(0, self.params.number_obstacles)
             else:
-                obstacle_number = self.params.obstacles_number_non_random
+                obstacle_number = self.params.number_obstacles
             while obstacles != obstacle_number:
                 coord = (random.randint(0, height - 1), random.randint(0, width - 1))
                 if coord != self.position.get_position():
                     mapa[coord[0], coord[1]] = -1
                     obstacles += 1
         self.global_map = GridMap(mapa)
-        self.local_map = GridMap(start=self.position.get_position())
+        if self.params.full_information:
+            self.local_map = self.global_map
+            self.local_map.visit_tile(self.position.get_position())
+        else:
+            self.local_map = GridMap(start=self.position.get_position())
         self.local_map.laser_scanner(self.position.get_position(), self.global_map)
         self.remaining = height * width - 1 - obstacle_number
         self.optimal_steps = self.remaining
@@ -133,5 +135,3 @@ class State:
         self.truncated = False
         s = self.local_map.center_map(self.position.get_position())
         self.state_array = [s, s, s, s]
-
-

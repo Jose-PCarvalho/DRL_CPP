@@ -6,8 +6,11 @@ from src.Environment.Actions import *
 from src.Environment.Vizualization import *
 from src.Environment.WallFollowing import *
 import random
+import yaml
+with open('configs/training.yaml', 'rb') as f:
+    conf = yaml.safe_load(f.read())    # load the config file
 
-env = Environment(EnvironmentParams())
+env = Environment(EnvironmentParams(conf['env2']))
 Viz = Vizualization()
 agent = WallFollower()
 while True:

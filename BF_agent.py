@@ -4,8 +4,11 @@ from src.Environment.Environment import *
 from src.Environment.Vizualization import *
 from src.Environment.BackAndForth import *
 import random
+import yaml
+with open('configs/training.yaml', 'rb') as f:
+    conf = yaml.safe_load(f.read())    # load the config file
 
-env = Environment(EnvironmentParams())
+env = Environment(EnvironmentParams(conf['env1']))
 Viz = Vizualization()
 agent = BackForth()
 while True:
