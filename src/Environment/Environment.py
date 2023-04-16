@@ -10,7 +10,7 @@ import tqdm
 class EnvironmentParams:
     def __init__(self, args):
         self.state_params = StateParams(args)
-        self.reward_params = RewardParams(1 / (self.state_params.size ** 2))
+        self.reward_params = RewardParams(self.state_params.size)
 
 
 class Environment:
@@ -19,10 +19,11 @@ class Environment:
         self.state = State(params.state_params)
         self.episode_count = 0
         self.viz = Vizualization()
+        self.params = params.state_params
 
     def reset(self):
         self.state.init_episode()
-        self.rewards.reset(1 / self.state.params.size)
+        self.rewards.reset(self.state.params.size)
         return self.get_observation(), self.get_info()
 
     def step(self, action):

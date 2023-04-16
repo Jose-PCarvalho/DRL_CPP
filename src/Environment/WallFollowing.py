@@ -39,7 +39,7 @@ class WallFollower:
                 self.counter += 1
 
         action = self.action_seq[self.counter]
-        print(action, self.counter,self.n_actions)
+
         return action
 
     def init(self, obs, size):

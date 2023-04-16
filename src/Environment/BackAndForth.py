@@ -34,10 +34,9 @@ class BackForth:
         if self.counter > 3:
             self.counter = 0
         action = self.action_seq[self.counter]
-        print(action, self.counter)
         return action
 
-    def init(self, obs):
+    def init(self, obs,size):
         self.center = obs.shape[1] // 2
         self.north = (self.center - 1, self.center)
         self.south = (self.center + 1, self.center)
