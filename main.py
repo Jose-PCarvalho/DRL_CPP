@@ -133,6 +133,8 @@ else:
     mem = ReplayMemory(args, args.memory_capacity)
 avg_reward = 0
 retries = 0
+all_T=0
+T=0
 for e in range(1, number_envs + 1):
     if e > 1 and avg_reward < 625 * 0.9:
         e -= 1
@@ -150,6 +152,7 @@ for e in range(1, number_envs + 1):
     non_rand = not conf[env_str]['starting_position_random']
     use_pseudo_agent = non_obstacles and non_rand
     val_mem = ReplayMemory(args, args.evaluation_size)
+    all_T+=T
     T, done, truncated = 0, True, True
     while T < args.evaluation_size:
 
@@ -163,7 +166,8 @@ for e in range(1, number_envs + 1):
 
     if args.evaluate:
         dqn.eval()  # Set DQN (online network) to evaluation mode
-        avg_reward, avg_Q, avg_overlap = test(args, 0, dqn, val_mem, metrics, results_dir, evaluate=True)  # Test
+        avg_reward, avg_Q, avg_overlap = test(args, 0, dqn, val_mem, metrics, results_dir, evaluate=True,
+                                              env_args=conf[env_str])  # Test
         print('Avg. reward: ' + str(avg_reward) + ' | Avg. Q: ' + str(avg_Q))
 
     else:
@@ -204,7 +208,7 @@ for e in range(1, number_envs + 1):
 
                 if T % args.evaluation_interval == 0:
                     dqn.eval()  # Set DQN (online network) to evaluation mode
-                    avg_reward, avg_Q, avg_overlap = test(args, T, dqn, val_mem, metrics, results_dir,env_args=conf[env_str])  # Test
+                    avg_reward, avg_Q, avg_overlap = test(args, T+all_T, dqn, val_mem, metrics, results_dir,env_args=conf[env_str])  # Test
                     log('T = ' + str(T) + ' / ' + str(args.T_max) + ' | env: ' + conf[env_str]['name'] +
                         ' | Avg. reward: ' + str(avg_reward) + ' | Avg. Q: ' + str(avg_Q) + ' | Avg. Overlap: ' + str(
                         avg_overlap))
