@@ -1,18 +1,32 @@
 env1:
   name: "env1: Full_Info_Non_Rand_Size5_Fixed_Starting_Pose"
   base_steps: 1000000
-  full_information: true
+  sensor: "full information"
+  sensor_range: 2
   size: 5
   min_size: 0
   random_size: false
   obstacles_random: false
   number_obstacles: 0
-  starting_position: [4,0]
+  starting_position: [0,4]
   starting_position_random : false
 env2:
-  name: "env2: Full_Info_Non_Rand_Size10_Fixed_Starting_Pose"
+  name: "env2: Full_Info_Non_Rand_Size5_Rand_Starting_Pose"
   base_steps: 1000000
-  full_information: true
+  sensor: "full information"
+  sensor_range: 2
+  size: 5
+  min_size: 0
+  random_size: false
+  obstacles_random: false
+  number_obstacles: 0
+  starting_position: [0,4]
+  starting_position_random : true
+env3:
+  name: "env3: Full_Info_Non_Rand_Size10_Fixed_Starting_Pose"
+  base_steps: 1000000
+  sensor: "full information"
+  sensor_range: 2
   size: 10
   min_size: 0
   random_size: false
@@ -20,65 +34,59 @@ env2:
   number_obstacles: 0
   starting_position: [9,0]
   starting_position_random : false
-env3:
-  name: "env3: Full_Info_Non_Rand_Size15_Fixed_Starting_Pose"
+env4:
+  name: "env4: Full_Info_Non_Rand_Size10_Rand_Starting_Pose"
   base_steps: 1000000
-  full_information: true
-  size: 15
+  sensor: "full information"
+  sensor_range: 2
+  size: 20
   min_size: 0
   random_size: false
   obstacles_random: false
   number_obstacles: 0
-  starting_position: [15,0]
-  starting_position_random : false
-env4:
-  name: "env4: Full_Info_Non_Rand_Size20_Fixed_Starting_Pose"
+  starting_position: [9,0]
+  starting_position_random : true
+env5:
+  name: "env5: Full_Info_Non_Rand_Size15_Fixed_Starting_Pose"
   base_steps: 1000000
-  full_information: true
-  size: 20
+  sensor: "full information"
+  sensor_range: 2
+  size: 5
+  min_size: 0
+  random_size: false
+  obstacles_random: false
+  number_obstacles: 0
+  starting_position: [14,0]
+  starting_position_random : false
+env6:
+  name: "env6: Full_Info_Non_Rand_Size15_Rand_Starting_Pose"
+  base_steps: 1000000
+  sensor: "full information"
+  sensor_range: 2
+  size: 10
+  min_size: 0
+  random_size: false
+  obstacles_random: false
+  number_obstacles: 0
+  starting_position: [14,0]
+  starting_position_random : true
+env7:
+  name: "env7: Full_Info_Non_Rand_Size20_Fixed_Starting_Pose"
+  base_steps: 1000000
+  sensor: "full information"
+  sensor_range: 2
+  size: 15
   min_size: 0
   random_size: false
   obstacles_random: false
   number_obstacles: 0
   starting_position: [19,0]
   starting_position_random : false
-env5:
-  name: "env5: Full_Info_Non_Rand_Size5_Rand_Starting_Pose"
-  base_steps: 1000000
-  full_information: true
-  size: 5
-  min_size: 0
-  random_size: false
-  obstacles_random: false
-  number_obstacles: 0
-  starting_position: [4,0]
-  starting_position_random : true
-env6:
-  name: "env6: Full_Info_Non_Rand_Size10_Rand_Starting_Pose"
-  base_steps: 1000000
-  full_information: true
-  size: 10
-  min_size: 0
-  random_size: false
-  obstacles_random: false
-  number_obstacles: 0
-  starting_position: [9,0]
-  starting_position_random : true
-env7:
-  name: "env7: Full_Info_Non_Rand_Size15_Rand_Starting_Pose"
-  base_steps: 1000000
-  full_information: true
-  size: 15
-  min_size: 0
-  random_size: false
-  obstacles_random: false
-  number_obstacles: 0
-  starting_position: [15,0]
-  starting_position_random : true
 env8:
   name: "env8: Full_Info_Non_Rand_Size20_Rand_Starting_Pose"
   base_steps: 1000000
-  full_information: true
+  sensor: "full information"
+  sensor_range: 2
   size: 20
   min_size: 0
   random_size: false

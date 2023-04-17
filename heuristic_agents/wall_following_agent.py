@@ -7,8 +7,9 @@ from src.Environment.Vizualization import *
 from src.Environment.WallFollowing import *
 import random
 import yaml
+
 with open('../configs/training.yaml', 'rb') as f:
-    conf = yaml.safe_load(f.read())    # load the config file
+    conf = yaml.safe_load(f.read())  # load the config file
 
 env = Environment(EnvironmentParams(conf['env1']))
 Viz = Vizualization()
@@ -16,11 +17,11 @@ agent = WallFollower()
 while True:
     observation, _ = env.reset()
     env.render()
-    agent.init(observation[0][-1],env.state.params.size)
+    agent.init(observation[0][-1], env.state.params.size)
     for t in itertools.count():
         action = agent.select_action(observation[0][-1])
         observation_, reward, done, truncated, info = env.step(action.value)
-        #print(action)
+        # print(action)
         # print(env.state.remaining)
         env.render()
         observation = observation_

@@ -43,7 +43,6 @@ class GridMap:
                 self.height = tile[0] + 1
                 self.width = self.height
 
-
             elif tile[1] >= self.width:
                 self.width = tile[1] + 1
                 self.height = self.width
@@ -86,8 +85,7 @@ class GridMap:
                     a[3, i, j] = 1
         return a
 
-    def laser_scanner(self, tile, full_map):
-        r = 4
+    def laser_scanner(self, tile, full_map, r):
         tiles = {"up": [],
                  "down": [],
                  "right": [],
@@ -117,7 +115,6 @@ class GridMap:
                 obstacles.append(True)
             else:
                 obstacles.append(False)
-
         for dir in directions:
             to_remove.clear()
             remove_further = False
@@ -145,6 +142,18 @@ class GridMap:
                 ranges[n] = -1
 
         return ranges
+
+    def camera(self, tile, full_map, r):
+        tiles = []
+        for i in range(-r , r +1):
+            for j in range(-r , r +1):
+                tiles.append((tile[0] + i, tile[1] + j))
+
+        full_map_tiles = full_map.getTiles()
+        local_map_tiles = self.getTiles()
+        for t in tiles:
+            if t in full_map_tiles and t not in local_map_tiles and all(cord >= 0 for cord in t):
+                self.new_tile(t, obstacle=t in full_map.obstacle_list)
 
     def center_map(self, position):
         new_size = 49

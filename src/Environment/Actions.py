@@ -13,4 +13,5 @@ class Events(Enum):
     NEW = 1
     REPEATED = 2
     FINISHED = 3
+    TIMEOUT = 4
 

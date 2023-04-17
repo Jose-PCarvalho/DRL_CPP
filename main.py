@@ -17,8 +17,11 @@ from src.Environment.BackAndForth import *
 from src.Environment.WallFollowing import *
 
 
-def log(s):
+def log(s,log_dir=None):
     print('[' + str(datetime.now().strftime('%Y-%m-%dT%H:%M:%S')) + '] ' + s)
+    if dir is not None:
+        with open(log_dir, 'a') as file:
+            file.write(('[' + str(datetime.now().strftime('%Y-%m-%dT%H:%M:%S')) + '] ' + s + '\n'))
 
 
 def load_memory(memory_path, disable_bzip):
@@ -77,7 +80,7 @@ parser.add_argument('--learn-start', type=int, default=int(50e3), metavar='STEPS
 parser.add_argument('--evaluate', action='store_true', help='Evaluate only')
 parser.add_argument('--evaluation-interval', type=int, default=10000, metavar='STEPS',
                     help='Number of training steps between evaluations')
-parser.add_argument('--evaluation-episodes', type=int, default=2, metavar='N',
+parser.add_argument('--evaluation-episodes', type=int, default=10, metavar='N',
                     help='Number of evaluation episodes to average over')
 # TODO: Note that DeepMind's evaluation method is running the latest agent for 500K frames ever every 1M steps
 parser.add_argument('--evaluation-size', type=int, default=250, metavar='N',
@@ -90,6 +93,7 @@ parser.add_argument('--memory', help='Path to save/load the memory from')
 parser.add_argument('--disable-bzip-memory', action='store_true',
                     help='Don\'t zip the memory file. Not recommended (zipping is a bit slower and much, much smaller)')
 parser.add_argument('--config-file', type=str, default='configs/training.yaml')
+parser.add_argument('--log-file', type=str, default='results/log.txt')
 
 # Setup
 args = parser.parse_args()
@@ -111,8 +115,12 @@ else:
     args.device = torch.device('cpu')
     print("Initiating CPU")
 
-with open('configs/training.yaml', 'rb') as f:
+with open(args.config_file, 'rb') as f:
     conf = yaml.safe_load(f.read())  # load the config file
+
+if args.log_file:
+    with open(args.log_file, 'w') as file:
+        pass
 
 number_envs = len(conf.keys())
 env = Environment(EnvironmentParams(conf['env1']))
@@ -145,6 +153,7 @@ for e in range(1, number_envs + 1):
         priority_weight_increase = (1 - args.priority_weight) / (args.T_max - args.learn_start)
         retries = 0
         args.T_max = conf['env' + str(e)]['base_steps']
+        mem = ReplayMemory(args, args.memory_capacity)
     env_str = 'env' + str(e)
     env = Environment(EnvironmentParams(conf[env_str]))
     print(conf[env_str])
@@ -183,7 +192,7 @@ for e in range(1, number_envs + 1):
                     alg = random.choice([BackForth, WallFollower])
                     pseudo_agent = alg()
                     pseudo_agent.init(state[0][-1], env.state.params.size)
-                    if T >= args.learn_start:
+                    if T >= args.learn_start*0.7:
                         use_pseudo_agent = False
 
             if T % args.replay_frequency == 0:
@@ -211,7 +220,7 @@ for e in range(1, number_envs + 1):
                     avg_reward, avg_Q, avg_overlap = test(args, T+all_T, dqn, val_mem, metrics, results_dir,env_args=conf[env_str])  # Test
                     log('T = ' + str(T) + ' / ' + str(args.T_max) + ' | env: ' + conf[env_str]['name'] +
                         ' | Avg. reward: ' + str(avg_reward) + ' | Avg. Q: ' + str(avg_Q) + ' | Avg. Overlap: ' + str(
-                        avg_overlap))
+                        avg_overlap),args.log_file)
                     dqn.train()  # Set DQN (online network) back to training mode
 
                     # If memory path provided, save it

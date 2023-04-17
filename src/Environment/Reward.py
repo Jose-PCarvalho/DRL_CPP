@@ -2,11 +2,12 @@ from src.Environment.Actions import Events
 
 
 class RewardParams:
-    def __init__(self, scaling,max_size=25):
+    def __init__(self, scaling, max_size=25):
         self.blocked_reward = -0.5
         self.repeated_field_reward = -0.5
         self.new_tile_reward = 1.0
-        self.map_complete = max_size**2-scaling**2
+        self.map_complete = max_size ** 2 - scaling ** 2
+        self.timeout = -scaling ** 2
         self.close_to_wall_reward = 1.0
         self.repeated_action_reward = 1.0
         self.finished_row_col = 1.0
@@ -54,6 +55,8 @@ class GridRewards:
             r += self.params.blocked_reward
         if Events.FINISHED in events:
             r += self.params.map_complete
+        if Events.TIMEOUT in events:
+            r += self.params.timeout
 
         self.cumulative_reward += r
 

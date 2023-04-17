@@ -5,6 +5,7 @@ from src.Environment.Vizualization import *
 from src.Environment.BackAndForth import *
 import random
 import yaml
+import time
 with open('../configs/training.yaml', 'rb') as f:
     conf = yaml.safe_load(f.read())    # load the config file
 
@@ -14,7 +15,7 @@ agent = BackForth()
 while True:
     observation, _ = env.reset()
     env.render()
-    agent.init(observation[0][-1])
+    agent.init(observation[0][-1],env.state.params.real_size)
     for t in itertools.count():
         action = agent.select_action(observation[0][-1])
         observation_, reward, done, truncated, info = env.step(action.value)

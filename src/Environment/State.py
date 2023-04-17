@@ -16,7 +16,7 @@ class Position:
 
 class StateParams:
     def __init__(self, args):
-        self.full_information = args['full_information']
+
         self.size = args['size']
         self.min_size = args['min_size']
         self.random_size = args['random_size']
@@ -24,6 +24,9 @@ class StateParams:
         self.number_obstacles = args['number_obstacles']
         self.starting_position_random = args['starting_position_random']
         self.starting_position = args['starting_position']
+        self.real_size = None
+        self.sensor_range = args['sensor_range']
+        self.sensor = args['sensor']
 
 
 class State:
@@ -84,22 +87,29 @@ class State:
             events.append(Events.REPEATED)
 
         self.last_action = action
-        self.local_map.laser_scanner(self.position.get_position(), self.global_map)
+        if self.params.sensor == "laser":
+            self.local_map.laser_scanner(self.position.get_position(), self.global_map, self.params.sensor_range)
+        elif self.params.sensor == "camera":
+            self.local_map.camera(self.position.get_position(), self.global_map, self.params.sensor_range)
+
         self.state_array.pop(0)
         self.state_array.append(self.local_map.center_map(self.position.get_position()))
         self.timesteps += 1
         self.t_to_go -= 1
         if self.t_to_go <= 0:
             self.truncated = True
+            events.append(Events.TIMEOUT)
         return events
 
     def init_episode(self):
         if self.params.random_size:
             width = random.randint(self.params.min_size, self.params.size)
             height = width
+            self.params.real_size = width
         else:
             width = self.params.size
             height = width
+            self.params.real_size = self.params.size
 
         if self.params.starting_position_random:
             self.position = Position(random.randint(0, height - 1), random.randint(0, width - 1))
@@ -120,17 +130,21 @@ class State:
                 if coord != self.position.get_position():
                     mapa[coord[0], coord[1]] = -1
                     obstacles += 1
+
         self.global_map = GridMap(mapa)
-        if self.params.full_information:
+        if self.params.sensor == "full information":
             self.local_map = self.global_map
-            self.local_map.visit_tile(self.position.get_position())
         else:
             self.local_map = GridMap(start=self.position.get_position())
-        self.local_map.laser_scanner(self.position.get_position(), self.global_map)
+        self.local_map.visit_tile(self.position.get_position())
+        if self.params.sensor == "laser":
+            self.local_map.laser_scanner(self.position.get_position(), self.global_map, self.params.sensor_range)
+        elif self.params.sensor == "camera":
+            self.local_map.camera(self.position.get_position(), self.global_map, self.params.sensor_range)
         self.remaining = height * width - 1 - obstacle_number
         self.optimal_steps = self.remaining
         self.timesteps = 0
-        self.t_to_go = self.params.size ** 2 * 20
+        self.t_to_go = self.params.size ** 2 * 10
         self.terminated = False
         self.truncated = False
         s = self.local_map.center_map(self.position.get_position())
