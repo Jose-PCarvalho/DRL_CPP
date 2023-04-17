@@ -20,6 +20,7 @@ class Agent:
         self.n = args.multi_step
         self.discount = args.discount
         self.norm_clip = args.norm_clip
+        self.device = args.device
 
         self.online_net = DQN(args, self.action_space).to(device=args.device)
         if args.model:  # Load pretrained model if provided
@@ -128,3 +129,8 @@ class Agent:
 
     def eval(self):
         self.online_net.eval()
+
+    def update_C51(self, size):
+        self.Vmin = -size ** 2 - 10
+        self.Vmax = size ** 2 + 10
+        self.support = torch.linspace(self.Vmin, self.Vmax, self.atoms).to(device=self.device)  # Support (range) of z

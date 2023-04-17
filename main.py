@@ -158,8 +158,8 @@ for e in range(1, number_envs + 1):
     env = Environment(EnvironmentParams(conf[env_str]))
     print(conf[env_str])
     non_obstacles = conf[env_str]['number_obstacles'] == 0
-    non_rand = not conf[env_str]['starting_position_random']
-    use_pseudo_agent = non_obstacles and non_rand
+    dqn.update_C51(conf[env_str]['size'])
+    use_pseudo_agent = non_obstacles
     val_mem = ReplayMemory(args, args.evaluation_size)
     all_T+=T
     T, done, truncated = 0, True, True
