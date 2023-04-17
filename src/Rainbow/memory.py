@@ -151,7 +151,7 @@ class ReplayMemory():
         # Create un-discretised states and nth next states
 
         all_states = transitions['state']
-        all_batteries = transitions['battery']
+        all_batteries = transitions['battery'].copy()
         states = torch.tensor(all_states[:, :self.history], device=self.device, dtype=torch.float32)
         next_states = torch.tensor(all_states[:, self.n:self.n + self.history], device=self.device,
                                    dtype=torch.float32)  # Discrete actions to be used as index
