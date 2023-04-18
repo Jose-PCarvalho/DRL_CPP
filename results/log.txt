@@ -1,0 +1,1 @@
+[2023-04-18T15:12:09] T = 50000 / 1000000 | env: env5: Full_Info_Non_Rand_Size15_Fixed_Starting_Pose | Avg. reward: -1019.5 | Avg. Q: -808.5228388671875 | Avg. Overlap: 0.9511111111111111

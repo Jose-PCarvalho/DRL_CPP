@@ -56,8 +56,8 @@ class Agent:
     def act(self, state, battery):
         with torch.no_grad():
             # state = torch.tensor(state[-1], dtype=torch.float32, device='cuda')
-            state = torch.tensor(state, dtype=torch.float32, device='cuda')
-            battery = torch.tensor(battery, dtype=torch.int32, device='cuda')
+            state = torch.tensor(state, dtype=torch.float32, device=self.device)
+            battery = torch.tensor(battery, dtype=torch.int32, device=self.device)
             return (self.online_net(state.unsqueeze(0), battery.unsqueeze(0)) * self.support).sum(2).argmax(1).item()
 
     # Acts with an ε-greedy policy (used for evaluation only)
@@ -99,8 +99,9 @@ class Agent:
             m = states.new_zeros(self.batch_size, self.atoms)
             offset = torch.linspace(0, ((self.batch_size - 1) * self.atoms), self.batch_size).unsqueeze(1).expand(
                 self.batch_size, self.atoms).to(actions)
-            m.view(-1).index_add_(0, (l + offset).view(-1),
-                                  (pns_a * (u.float() - b)).view(-1))  # m_l = m_l + p(s_t+n, a*)(u - b)
+            idxxx=(l + offset).view(-1)
+            srccc=(pns_a * (u.float() - b)).view(-1)
+            m.view(-1).index_add_(0,idxxx,srccc)
             m.view(-1).index_add_(0, (u + offset).view(-1),
                                   (pns_a * (b - l.float())).view(-1))  # m_u = m_u + p(s_t+n, a*)(b - l)
 
@@ -134,3 +135,4 @@ class Agent:
         self.Vmin = -size ** 2 * 10
         self.Vmax = size ** 2 + 10
         self.support = torch.linspace(self.Vmin, self.Vmax, self.atoms).to(device=self.device)  # Support (range) of z
+        self.delta_z = (self.Vmax - self.Vmin) / (self.atoms - 1)
