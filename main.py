@@ -129,26 +129,28 @@ starting_priority_weight = args.priority_weight
 dqn = Agent(args, action_space)
 
 # If a model is provided, and evaluate is false, presumably we want to resume, so try to load memory
-if args.model is not None and not args.evaluate:
-    if not args.memory:
-        raise ValueError('Cannot resume training without memory save path. Aborting...')
-    elif not os.path.exists(args.memory):
-        raise ValueError('Could not find memory file at {path}. Aborting...'.format(path=args.memory))
-
-    mem = load_memory(args.memory, args.disable_bzip_memory)
-
-else:
-    mem = ReplayMemory(args, args.memory_capacity)
-avg_reward = 0
+# if args.model is not None and not args.evaluate:
+#     if not args.memory:
+#         raise ValueError('Cannot resume training without memory save path. Aborting...')
+#     elif not os.path.exists(args.memory):
+#         raise ValueError('Could not find memory file at {path}. Aborting...'.format(path=args.memory))
+#
+#     mem = load_memory(args.memory, args.disable_bzip_memory)
+#
+# else:
+mem = ReplayMemory(args, args.memory_capacity)
+avg_overlap = 0
 retries = 0
 all_T=0
 T=0
-for e in range(1, number_envs + 1):
-    if e > 1 and avg_reward < 625 * 0.9:
+e=5
+while e < number_envs+1:
+    if e > 1 and avg_overlap >0.2:
         e -= 1
         args.priority_weight = (1 - starting_priority_weight) / (retries + 1) + starting_priority_weight
         retries += 1
     else:
+        print(avg_overlap)
         args.priority_weight = starting_priority_weight
         priority_weight_increase = (1 - args.priority_weight) / (args.T_max - args.learn_start)
         retries = 0
@@ -236,5 +238,6 @@ for e in range(1, number_envs + 1):
                     dqn.save(results_dir, 'checkpoint.pth')
 
             state = next_state
+        e+=1
 
     # env.close()

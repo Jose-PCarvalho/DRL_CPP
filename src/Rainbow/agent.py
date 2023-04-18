@@ -131,6 +131,6 @@ class Agent:
         self.online_net.eval()
 
     def update_C51(self, size):
-        self.Vmin = -size ** 2 - 10
+        self.Vmin = -size ** 2 * 10
         self.Vmax = size ** 2 + 10
         self.support = torch.linspace(self.Vmin, self.Vmax, self.atoms).to(device=self.device)  # Support (range) of z
