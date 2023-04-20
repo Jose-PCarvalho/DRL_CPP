@@ -43,7 +43,7 @@ def save_memory(memory, memory_path, disable_bzip):
 
 
 def use_pseudo(ovrl):
-    p = -3.5 * (1 - ovrl) + 0.7
+    p = -1.4 * (1 - ovrl) + 0.7
     eps = np.random.random()
     if eps < p:
         return True
@@ -203,7 +203,7 @@ while e < number_envs + 1:
             if done or truncated:
                 state, _ = env.reset()
                 pseudo_episode = False
-                if use_pseudo_agent and avg_overlap > 0.8:
+                if use_pseudo_agent and avg_overlap > 0.5:
                     pseudo_episode = use_pseudo(avg_overlap)
                     if pseudo_episode:
                         alg = random.choice([BackForth, WallFollower])
