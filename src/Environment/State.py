@@ -16,7 +16,6 @@ class Position:
 
 class StateParams:
     def __init__(self, args):
-
         self.size = args['size']
         self.min_size = args['min_size']
         self.random_size = args['random_size']
@@ -24,6 +23,7 @@ class StateParams:
         self.number_obstacles = args['number_obstacles']
         self.starting_position_random = args['starting_position_random']
         self.starting_position = args['starting_position']
+        self.starting_position_corner = args['starting_position_corner']
         self.real_size = None
         self.sensor_range = args['sensor_range']
         self.sensor = args['sensor']
@@ -113,6 +113,11 @@ class State:
 
         if self.params.starting_position_random:
             self.position = Position(random.randint(0, height - 1), random.randint(0, width - 1))
+        elif self.params.starting_position_corner:
+            corners = [(0, 0), (self.params.real_size - 1, 0), (self.params.real_size - 1, self.params.real_size - 1),
+                       (0, self.params.real_size - 1)]
+            pos = random.choice(corners)
+            self.position = Position(pos[0], pos[1])
         else:
             self.position = Position(self.params.starting_position[0], self.params.starting_position[1])
         mapa = np.zeros((height, width), dtype=int)

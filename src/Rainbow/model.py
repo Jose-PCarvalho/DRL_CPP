@@ -67,7 +67,7 @@ class DQN(nn.Module):
             self.convs = nn.Sequential(nn.Conv2d(12, 32, 3, stride=1, padding='same'), nn.ReLU(),
                                        nn.Conv2d(32, 64, 4, stride=2, padding=0), nn.ReLU(), #stride 1
                                        nn.Conv2d(64, 64, 3, stride=2, padding=0), nn.ReLU()) #kernel size 3 , stride 2, stable version had kernel 4
-            self.conv_output_size = self._get_conv_out([12, 49, 49])
+            self.conv_output_size = self._get_conv_out([12, 37, 37])
         self.fc_h_v = NoisyLinear(self.conv_output_size + 1, args.hidden_size, std_init=args.noisy_std)
         self.fc_h_a = NoisyLinear(self.conv_output_size + 1, args.hidden_size, std_init=args.noisy_std)
         self.fc_z_v = NoisyLinear(args.hidden_size, self.atoms, std_init=args.noisy_std)

@@ -6,10 +6,10 @@ import torch
 # blank_state = (np.zeros((4, 9, 9), dtype=np.uint8), 0)
 
 Transition_dtype = np.dtype(
-    [('timestep', np.int32), ('state', np.uint8, (4, 49, 49)), ('battery', np.int32), ('action', np.int32),
+    [('timestep', np.int32), ('state', np.uint8, (4, 37, 37)), ('battery', np.int32), ('action', np.int32),
      ('reward', np.float32),
      ('nonterminal', np.bool_)])
-blank_trans = (0, np.zeros((4, 49, 49), dtype=np.uint8), 0, 0, 0.0, False)
+blank_trans = (0, np.zeros((4, 37, 37), dtype=np.uint8), 0, 0, 0.0, False)
 
 
 # Segment tree data structure where parent node values are sum/max of children node values

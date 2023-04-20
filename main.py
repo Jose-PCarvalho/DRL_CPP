@@ -17,7 +17,7 @@ from src.Environment.BackAndForth import *
 from src.Environment.WallFollowing import *
 
 
-def log(s,log_dir=None):
+def log(s, log_dir=None):
     print('[' + str(datetime.now().strftime('%Y-%m-%dT%H:%M:%S')) + '] ' + s)
     if dir is not None:
         with open(log_dir, 'a') as file:
@@ -40,6 +40,15 @@ def save_memory(memory, memory_path, disable_bzip):
     else:
         with bz2.open(memory_path, 'wb') as zipped_pickle_file:
             pickle.dump(memory, zipped_pickle_file)
+
+
+def use_pseudo(ovrl):
+    p = -3.5 * (1 - ovrl) + 0.7
+    eps = np.random.random()
+    if eps < p:
+        return True
+    else:
+        return False
 
 
 # Note that hyperparameters may originally be reported in ATARI game frames instead of agent steps
@@ -66,7 +75,7 @@ parser.add_argument('--priority-exponent', type=float, default=0.5, metavar='ω'
                     help='Prioritised experience replay exponent (originally denoted α)')
 parser.add_argument('--priority-weight', type=float, default=0.4, metavar='β',
                     help='Initial prioritised experience replay importance sampling weight')
-parser.add_argument('--multi-step', type=int, default=20, metavar='n', help='Number of steps for multi-step return')
+parser.add_argument('--multi-step', type=int, default=5, metavar='n', help='Number of steps for multi-step return')
 parser.add_argument('--discount', type=float, default=0.99, metavar='γ', help='Discount factor')
 parser.add_argument('--target-update', type=int, default=int(8e3), metavar='τ',
                     help='Number of steps after which to update target network')
@@ -138,14 +147,16 @@ dqn = Agent(args, action_space)
 #     mem = load_memory(args.memory, args.disable_bzip_memory)
 #
 # else:
+
 mem = ReplayMemory(args, args.memory_capacity)
 avg_overlap = 0
 retries = 0
-all_T=0
-T=0
-e=0
-while e < number_envs+1:
-    if e > 1 and avg_overlap >0.2:
+all_T = 0
+T = 0
+e = 1
+while e < number_envs + 1:
+
+    if e > 1 and avg_overlap > 0.2:
         e -= 1
         args.priority_weight = (1 - starting_priority_weight) / (retries + 1) + starting_priority_weight
         retries += 1
@@ -161,10 +172,11 @@ while e < number_envs+1:
     print(conf[env_str])
     non_obstacles = conf[env_str]['number_obstacles'] == 0
     dqn.update_C51(conf[env_str]['size'])
-    use_pseudo_agent = non_obstacles
+    use_pseudo_agent, pseudo_episode = non_obstacles, non_obstacles
     val_mem = ReplayMemory(args, args.evaluation_size)
-    all_T+=T
+    all_T += T
     T, done, truncated = 0, True, True
+    avg_overlap = 1
     while T < args.evaluation_size:
 
         if done or truncated:
@@ -190,17 +202,18 @@ while e < number_envs+1:
 
             if done or truncated:
                 state, _ = env.reset()
-                if use_pseudo_agent:
-                    alg = random.choice([BackForth, WallFollower])
-                    pseudo_agent = alg()
-                    pseudo_agent.init(state[0][-1], env.state.params.size)
-                    if T >= args.learn_start*0.7:
-                        use_pseudo_agent = False
+                pseudo_episode = False
+                if use_pseudo_agent and avg_overlap > 0.8:
+                    pseudo_episode = use_pseudo(avg_overlap)
+                    if pseudo_episode:
+                        alg = random.choice([BackForth, WallFollower])
+                        pseudo_agent = alg()
+                        pseudo_agent.init(state[0][-1], env.state.params.size)
 
             if T % args.replay_frequency == 0:
                 dqn.reset_noise()  # Draw a new set of noisy weights
 
-            if T >= args.learn_start or not use_pseudo_agent:
+            if not pseudo_episode:
                 action = dqn.act(state[0], state[1])
             else:
                 action = pseudo_agent.select_action(state[0][-1]).value
@@ -219,10 +232,11 @@ while e < number_envs+1:
 
                 if T % args.evaluation_interval == 0:
                     dqn.eval()  # Set DQN (online network) to evaluation mode
-                    avg_reward, avg_Q, avg_overlap = test(args, T+all_T, dqn, val_mem, metrics, results_dir,env_args=conf[env_str])  # Test
+                    avg_reward, avg_Q, avg_overlap = test(args, T + all_T, dqn, val_mem, metrics, results_dir,
+                                                          env_args=conf[env_str])  # Test
                     log('T = ' + str(T) + ' / ' + str(args.T_max) + ' | env: ' + conf[env_str]['name'] +
                         ' | Avg. reward: ' + str(avg_reward) + ' | Avg. Q: ' + str(avg_Q) + ' | Avg. Overlap: ' + str(
-                        avg_overlap),args.log_file)
+                        avg_overlap), args.log_file)
                     dqn.train()  # Set DQN (online network) back to training mode
 
                     # If memory path provided, save it
@@ -238,6 +252,7 @@ while e < number_envs+1:
                     dqn.save(results_dir, 'checkpoint.pth')
 
             state = next_state
-        e+=1
+        e += 1
+        dqn.save(results_dir, conf[env_str]['name'] + '.pth')
 
     # env.close()

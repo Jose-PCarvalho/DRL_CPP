@@ -95,12 +95,12 @@ class GridMap:
                  "down-right": [],
                  "down-left": []
                  }
-        for i in range(1, r):
+        for i in range(1, r+1):
             tiles["up"].append((tile[0] - i, tile[1]))
             tiles["down"].append((tile[0] + i, tile[1]))
             tiles["right"].append((tile[0], tile[1] + i))
             tiles["left"].append((tile[0], tile[1] - i))
-        for i in range(1, ceil(r / np.sqrt(r) + 1)):
+        for i in range(1, ceil(r / np.sqrt(r)+1)):
             tiles["up-right"].append((tile[0] - i, tile[1] + i))
             tiles["up-left"].append((tile[0] - i, tile[1] - i))
             tiles["down-right"].append((tile[0] + i, tile[1] + i))
@@ -156,7 +156,7 @@ class GridMap:
                 self.new_tile(t, obstacle=t in full_map.obstacle_list)
 
     def center_map(self, position):
-        new_size = 49
+        new_size = 37
         # calculate the center index of the new array
         center_index = new_size // 2
 

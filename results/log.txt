@@ -1,1 +1,3 @@
-[2023-04-18T15:12:09] T = 50000 / 1000000 | env: env5: Full_Info_Non_Rand_Size15_Fixed_Starting_Pose | Avg. reward: -1019.5 | Avg. Q: -808.5228388671875 | Avg. Overlap: 0.9511111111111111
+[2023-04-20T11:50:45] T = 70000 / 350000 | env: env1: Full_Info_Non_Rand_Size5_Fixed_Starting_Pose | Avg. reward: -975.5 | Avg. Q: 58.829257522583006 | Avg. Overlap: 0.985
+[2023-04-20T11:52:26] T = 80000 / 350000 | env: env1: Full_Info_Non_Rand_Size5_Fixed_Starting_Pose | Avg. reward: -975.5 | Avg. Q: 13.996392887115478 | Avg. Overlap: 0.985
+[2023-04-20T11:54:11] T = 90000 / 350000 | env: env1: Full_Info_Non_Rand_Size5_Fixed_Starting_Pose | Avg. reward: -998.0 | Avg. Q: 11.95736880683899 | Avg. Overlap: 0.994

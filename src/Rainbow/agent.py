@@ -99,9 +99,8 @@ class Agent:
             m = states.new_zeros(self.batch_size, self.atoms)
             offset = torch.linspace(0, ((self.batch_size - 1) * self.atoms), self.batch_size).unsqueeze(1).expand(
                 self.batch_size, self.atoms).to(actions)
-            idxxx=(l + offset).view(-1)
-            srccc=(pns_a * (u.float() - b)).view(-1)
-            m.view(-1).index_add_(0,idxxx,srccc)
+            m.view(-1).index_add_(0, (l + offset).view(-1),
+                                  (pns_a * (u.float() - b)).view(-1))  # m_l = m_l + p(s_t+n, a*)(u - b)
             m.view(-1).index_add_(0, (u + offset).view(-1),
                                   (pns_a * (b - l.float())).view(-1))  # m_u = m_u + p(s_t+n, a*)(b - l)
 
@@ -132,7 +131,7 @@ class Agent:
         self.online_net.eval()
 
     def update_C51(self, size):
-        self.Vmin = -size ** 2 * 10
-        self.Vmax = size ** 2 + 10
+        self.Vmin = -size ** 2
+        self.Vmax = size ** 2
         self.support = torch.linspace(self.Vmin, self.Vmax, self.atoms).to(device=self.device)  # Support (range) of z
         self.delta_z = (self.Vmax - self.Vmin) / (self.atoms - 1)

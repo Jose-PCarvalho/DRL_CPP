@@ -18,61 +18,51 @@ class Vizualization:
             self.window = pygame.display.set_mode((self.window_size, self.window_size))
         if self.clock is None:
             self.clock = pygame.time.Clock()
-        size = max(mapa.width * 2 - 1, mapa.height * 2 - 1)
+        a = graph_to_RGB_array(mapa.graph_to_array())
+        size = a.shape[1]
         canvas = pygame.Surface((self.window_size, self.window_size))
-        canvas.fill((0, 0, 0))
+        canvas.fill((0, 255, 0))
         pix_square_size = (
                 self.window_size / size
         )  # The size of a single grid square in pixels
 
         # First we draw the target
-        a = mapa.center_map(pos.get_position())
         for i in range(a.shape[1]):
             for j in range(a.shape[2]):
-                print(a[:, i, j])
-                if a[0, i, j] == 1:
-                    pygame.draw.rect(
-                        canvas,
-                        (255, 0, 0),
-                        pygame.Rect(
-                            pix_square_size * np.array([j, i]),
-                            (pix_square_size, pix_square_size),
-                        ),
-                    )
-                elif a[1, i, j] == 1:
-                    pygame.draw.rect(
-                        canvas,
-                        (255, 255, 255),
-                        pygame.Rect(
-                            pix_square_size * np.array([j, i]),
-                            (pix_square_size, pix_square_size),
-                        ),
-                    )
-                elif a[2, i, j] == 1:
-                    pygame.draw.rect(
-                        canvas,
-                        (0, 0, 0),
-                        pygame.Rect(
-                            pix_square_size * np.array([j, i]),
-                            (pix_square_size, pix_square_size),
-                        ),
-                    )
-                elif a[3, i, j] == 1:
-                    pygame.draw.rect(
-                        canvas,
-                        (0, 0, 255),
-                        pygame.Rect(
-                            pix_square_size * np.array([j, i]),
-                            (pix_square_size, pix_square_size),
-                        ),
-                    )
+                pygame.draw.rect(
+                    canvas,
+                    a[:, i, j],
+                    pygame.Rect(
+                        pix_square_size * np.array([j, i]),
+                        (pix_square_size, pix_square_size),
+                    ),
+                )
+
+
+        # Finally, add some gridlines
+        for x in range(a.shape[1] + 1):
+            pygame.draw.line(
+                canvas,
+                0,
+                (0, pix_square_size * x),
+                (self.window_size, pix_square_size * x),
+                width=3,
+            )
+            for x in range(a.shape[1] + 1):
+                pygame.draw.line(
+                    canvas,
+                    0,
+                    (pix_square_size * x, 0),
+                    (pix_square_size * x, self.window_size),
+                    width=3,
+                )
 
         # Now we draw the agent
 
         pygame.draw.circle(
             canvas,
             (0, 0, 255),
-            (np.flip(np.array([4, 4])) + 0.5) * pix_square_size,
+            (np.flip(np.array(pos.get_position())) + 0.5) * pix_square_size,
             pix_square_size / 3,
         )
 
