@@ -1,13 +1,13 @@
 env1:
   name: "env1: Full_Info_Non_Rand_Size5_Fixed_Starting_Pose"
   base_steps: 350000
-  sensor: "laser"
+  sensor: "full information"
   sensor_range: 2
   size: 5
   min_size: 0
   random_size: false
   obstacles_random: false
-  number_obstacles: 0
+  number_obstacles: 5
   starting_position: [3,0]
   starting_position_corner : true
   starting_position_random : false

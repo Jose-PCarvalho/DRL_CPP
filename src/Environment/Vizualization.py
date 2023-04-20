@@ -149,7 +149,7 @@ class Vizualization:
 
 
 def graph_to_RGB_array(a):
-    rgb = -1 * np.ones((3, a.shape[1], a.shape[2]), dtype=np.uint8)
+    rgb = np.zeros((3, a.shape[1], a.shape[2]), dtype=np.uint8)
 
     for i in range(a.shape[1]):
         for j in range(a.shape[2]):
@@ -161,4 +161,6 @@ def graph_to_RGB_array(a):
                 rgb[:, i, j] = [0, 0, 0]
             elif a[3, i, j] == 1:
                 rgb[:, i, j] = [0, 0, 255]
+            else:
+                rgb[:, i, j] = [0, 255, 0]
     return rgb

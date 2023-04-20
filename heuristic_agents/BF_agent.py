@@ -27,4 +27,3 @@ while True:
         observation = observation_
         if done or truncated:
             break
-        time.sleep(5)

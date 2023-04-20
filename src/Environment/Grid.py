@@ -76,13 +76,13 @@ class GridMap:
             for j in range(self.width):
                 tile = (i, j)
                 if tile in self.visited_list:
-                    a[0, i, j] = 1
+                    a[:, i, j] = [1, 0, 0, 0]
                 elif tile in (self.getTiles()) and tile not in (set(self.visited_list).union(set(self.obstacle_list))):
-                    a[1, i, j] = 1
+                    a[:, i, j] = [0, 1, 0, 0]
                 elif tile in self.obstacle_list:
-                    a[2, i, j] = 1
+                    a[:, i, j] = [0, 0, 1, 0]
                 else:
-                    a[3, i, j] = 1
+                    a[:, i, j] = [0, 0, 0, 1]
         return a
 
     def laser_scanner(self, tile, full_map, r):
@@ -95,12 +95,12 @@ class GridMap:
                  "down-right": [],
                  "down-left": []
                  }
-        for i in range(1, r+1):
+        for i in range(1, r + 1):
             tiles["up"].append((tile[0] - i, tile[1]))
             tiles["down"].append((tile[0] + i, tile[1]))
             tiles["right"].append((tile[0], tile[1] + i))
             tiles["left"].append((tile[0], tile[1] - i))
-        for i in range(1, ceil(r / np.sqrt(r)+1)):
+        for i in range(1, ceil(r / np.sqrt(r) + 1)):
             tiles["up-right"].append((tile[0] - i, tile[1] + i))
             tiles["up-left"].append((tile[0] - i, tile[1] - i))
             tiles["down-right"].append((tile[0] + i, tile[1] + i))
@@ -110,43 +110,43 @@ class GridMap:
         obstacles = []
         full_map_tiles = full_map.getTiles()
         local_map_tiles = self.getTiles()
+        # for dir in directions:
+        #     if tiles[dir][0] not in full_map_tiles or tiles[dir][0] in full_map.obstacle_list:
+        #         obstacles.append(True)
+        #     else:
+        #         obstacles.append(False)
         for dir in directions:
-            if tiles[dir][0] not in full_map_tiles or tiles[dir][0] in full_map.obstacle_list:
-                obstacles.append(True)
-            else:
-                obstacles.append(False)
-        for dir in directions:
-            to_remove.clear()
-            remove_further = False
+            # to_remove.clear()
+            # remove_further = False
             for t in tiles[dir]:
-                if t in full_map.getTiles() and t not in local_map_tiles:
+                if t in full_map_tiles and t not in local_map_tiles:
                     if t in full_map.obstacle_list:
                         self.new_tile(t, obstacle=True)
                     else:
                         self.new_tile(t)
-                elif t not in full_map_tiles:
-                    to_remove.append(t)
-
-                if t in (self.visited_list + self.obstacle_list) or (remove_further and t in full_map_tiles):
-                    to_remove.append(t)
-                    remove_further = True
-            for rem in to_remove:
-                if rem in tiles[dir]:
-                    tiles[dir].remove(rem)
-        ranges = []
-        for dir in directions:
-            ranges.append(len(tiles[dir]))
-
-        for n in range(len(ranges)):
-            if ranges[n] == 0 and obstacles[n] == True:
-                ranges[n] = -1
-
-        return ranges
+        #         elif t not in full_map_tiles:
+        #             to_remove.append(t)
+        #
+        #         if t in (self.visited_list + self.obstacle_list) or (remove_further and t in full_map_tiles):
+        #             to_remove.append(t)
+        #             remove_further = True
+        #     for rem in to_remove:
+        #         if rem in tiles[dir]:
+        #             tiles[dir].remove(rem)
+        # ranges = []
+        # for dir in directions:
+        #     ranges.append(len(tiles[dir]))
+        #
+        # for n in range(len(ranges)):
+        #     if ranges[n] == 0 and obstacles[n] == True:
+        #         ranges[n] = -1
+        #
+        # return ranges
 
     def camera(self, tile, full_map, r):
         tiles = []
-        for i in range(-r , r +1):
-            for j in range(-r , r +1):
+        for i in range(-r, r + 1):
+            for j in range(-r, r + 1):
                 tiles.append((tile[0] + i, tile[1] + j))
 
         full_map_tiles = full_map.getTiles()
