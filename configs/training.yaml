@@ -1,6 +1,6 @@
 env1:
   name: "env1: Full_Info_Non_Rand_Size5_Fixed_Starting_Pose"
-  base_steps: 350000
+  base_steps: 500000
   sensor: "full information"
   sensor_range: 2
   size: 5
