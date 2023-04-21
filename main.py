@@ -153,7 +153,7 @@ avg_overlap = 0
 retries = 0
 all_T = 0
 T = 0
-e = 1
+e = 8
 while e < number_envs + 1:
 
     if e > 1 and avg_overlap > 0.2:

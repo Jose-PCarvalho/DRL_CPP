@@ -7,7 +7,7 @@ env1:
   min_size: 0
   random_size: false
   obstacles_random: false
-  number_obstacles: 5
+  number_obstacles: 0
   starting_position: [3,0]
   starting_position_corner : true
   starting_position_random : false
