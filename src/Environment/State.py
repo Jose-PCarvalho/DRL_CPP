@@ -1,3 +1,5 @@
+import time
+
 from src.Environment.Actions import Actions, Events
 import random
 import numpy as np
@@ -146,7 +148,6 @@ class State:
         self.global_map = GridMap(mapa)
         if self.params.map_data is not None or self.params.number_obstacles>0:
             self.global_map.fix_map(self.position.get_position())
-
         if self.params.sensor == "full information":
             self.local_map = self.global_map
         else:

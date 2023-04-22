@@ -101,9 +101,9 @@ parser.add_argument('--checkpoint-interval', default=50000,
 parser.add_argument('--memory', help='Path to save/load the memory from')
 parser.add_argument('--disable-bzip-memory', action='store_true',
                     help='Don\'t zip the memory file. Not recommended (zipping is a bit slower and much, much smaller)')
-parser.add_argument('--config-file', type=str, default='configs/training.yaml')
+parser.add_argument('--config-file', type=str, default='configs/training_obstacles.yaml')
 parser.add_argument('--log-file', type=str, default='results/log.txt')
-parser.add_argument('--starting-episode',type=int, default=1)
+parser.add_argument('--starting-episode',type=int, default=3)
 
 # Setup
 args = parser.parse_args()
@@ -154,7 +154,7 @@ avg_overlap = 0
 retries = 0
 all_T = 0
 T = 0
-e = args['starting_episode']
+e = args.starting_episode
 while e < number_envs + 1:
 
     if e > 1 and avg_overlap > 0.2:

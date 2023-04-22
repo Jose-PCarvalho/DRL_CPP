@@ -28,7 +28,7 @@ env2:
   map_config : 'empty'
 env3:
   name: "env3:Full_Info_Non_Rand_Size10_Fixed_Starting_Pose_Obstacle"
-  base_steps: 8000000
+  base_steps: 800000
   sensor: "full information"
   sensor_range: 2
   size: 10
