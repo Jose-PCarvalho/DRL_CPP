@@ -1,7 +1,7 @@
 from src.Environment.Actions import Actions, Events
 import random
 import numpy as np
-
+import yaml
 from src.Environment.Grid import GridMap
 
 
@@ -27,6 +27,12 @@ class StateParams:
         self.real_size = None
         self.sensor_range = args['sensor_range']
         self.sensor = args['sensor']
+        if args['map_config'] != 'empty':
+            with open(args['map_config'], 'r') as file:
+                yaml_data = yaml.safe_load(file)
+            self.map_data = np.array(yaml_data['map'])
+        else:
+            self.map_data = None
 
 
 class State:
@@ -120,33 +126,41 @@ class State:
             self.position = Position(pos[0], pos[1])
         else:
             self.position = Position(self.params.starting_position[0], self.params.starting_position[1])
-        mapa = np.zeros((height, width), dtype=int)
-        mapa[self.position.x, self.position.y] = 1
 
-        obstacles = 0
-        obstacle_number = 0
-        if self.params.number_obstacles > 0:
-            if self.params.obstacles_random:
-                obstacle_number = random.randint(0, self.params.number_obstacles)
-            else:
-                obstacle_number = self.params.number_obstacles
-            while obstacles != obstacle_number:
-                coord = (random.randint(0, height - 1), random.randint(0, width - 1))
-                if coord != self.position.get_position():
-                    mapa[coord[0], coord[1]] = -1
-                    obstacles += 1
+        if self.params.map_data is not None:
+            mapa = self.params.map_data
+        else:
+            mapa = np.zeros((height, width), dtype=int)
+            if self.params.number_obstacles > 0:
+                if self.params.obstacles_random:
+                    obstacle_number = random.randint(0, self.params.number_obstacles)
+                else:
+                    obstacle_number = self.params.number_obstacles
+                obstacles = 0
+                while obstacles != obstacle_number:
+                    coord = (random.randint(0, height - 1), random.randint(0, width - 1))
+                    if coord != self.position.get_position():
+                        mapa[coord[0], coord[1]] = -1
+                        obstacles += 1
 
         self.global_map = GridMap(mapa)
+        if self.params.map_data is not None or self.params.number_obstacles>0:
+            self.global_map.fix_map(self.position.get_position())
+
         if self.params.sensor == "full information":
             self.local_map = self.global_map
         else:
             self.local_map = GridMap(start=self.position.get_position())
+
         self.local_map.visit_tile(self.position.get_position())
+
         if self.params.sensor == "laser":
             self.local_map.laser_scanner(self.position.get_position(), self.global_map, self.params.sensor_range)
         elif self.params.sensor == "camera":
             self.local_map.camera(self.position.get_position(), self.global_map, self.params.sensor_range)
-        self.remaining = height * width - 1 - obstacle_number
+
+        self.remaining = len(set(self.local_map.getTiles()).difference(
+            self.local_map.obstacle_list)) - 1  # height * width - 1 - obstacle_number
         self.optimal_steps = self.remaining
         self.timesteps = 0
         self.t_to_go = self.params.size ** 2 * 10

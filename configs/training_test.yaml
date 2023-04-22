@@ -1,0 +1,14 @@
+env1:
+  name: "env1: Full_Info_Non_Rand_Size5_Fixed_Starting_Pose"
+  base_steps: 500000
+  sensor: "full information"
+  sensor_range: 2
+  size: 10
+  min_size: 0
+  random_size: false
+  obstacles_random: false
+  number_obstacles: 10
+  starting_position: [3,0]
+  starting_position_corner : true
+  starting_position_random : false
+  map_config : '../maps/test.yaml'

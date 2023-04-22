@@ -6,7 +6,7 @@ from src.Environment.BackAndForth import *
 import random
 import yaml
 import time
-with open('../configs/training.yaml', 'rb') as f:
+with open('../configs/training_test.yaml', 'rb') as f:
     conf = yaml.safe_load(f.read())    # load the config file
 
 env = Environment(EnvironmentParams(conf['env1']))

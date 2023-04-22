@@ -1,21 +1,20 @@
 env1:
-  name: "env1: Full_Info_Non_Rand_Size5_Fixed_Starting_Pose"
+  name: "env1:Camera_Non_Rand_Size5_Fixed_Starting_Pose"
   base_steps: 500000
-  sensor: "full information"
+  sensor: "camera"
   sensor_range: 2
   size: 5
   min_size: 0
   random_size: false
   obstacles_random: false
-  number_obstacles: 0
+  number_obstacles: 5
   starting_position: [3,0]
   starting_position_corner : true
   starting_position_random : false
-  map_config : 'empty'
 env2:
-  name: "env2: Full_Info_Non_Rand_Size5_Rand_Starting_Pose"
-  base_steps: 1500000
-  sensor: "full information"
+  name: "env2:Camera_Non_Rand_Size5_Rand_Starting_Pose"
+  base_steps: 100000
+  sensor: "camera"
   sensor_range: 2
   size: 5
   min_size: 0
@@ -25,11 +24,10 @@ env2:
   starting_position: [0,4]
   starting_position_corner : false
   starting_position_random : true
-  map_config : 'empty'
 env3:
-  name: "env3: Full_Info_Non_Rand_Size10_Fixed_Starting_Pose"
+  name: "env3:Camera_Info_Non_Rand_Size10_Fixed_Starting_Pose"
   base_steps: 1000000
-  sensor: "full information"
+  sensor: "camera"
   sensor_range: 2
   size: 10
   min_size: 0
@@ -39,11 +37,10 @@ env3:
   starting_position: [9,0]
   starting_position_corner : true
   starting_position_random : false
-  map_config : 'empty'
 env4:
-  name: "env4: Full_Info_Non_Rand_Size10_Rand_Starting_Pose"
-  base_steps: 1800000
-  sensor: "full information"
+  name: "env4:Camera_Non_Rand_Size10_Rand_Starting_Pose"
+  base_steps: 1000000
+  sensor: "camera"
   sensor_range: 2
   size: 10
   min_size: 0
@@ -53,11 +50,10 @@ env4:
   starting_position: [9,0]
   starting_position_corner : false
   starting_position_random : true
-  map_config : 'empty'
 env5:
-  name: "env5: Full_Info_Non_Rand_Size15_Fixed_Starting_Pose"
-  base_steps: 2000000
-  sensor: "full information"
+  name: "env5:Camera_Non_Rand_Size15_Fixed_Starting_Pose"
+  base_steps: 1000000
+  sensor: "camera"
   sensor_range: 2
   size: 15
   min_size: 0
@@ -67,11 +63,10 @@ env5:
   starting_position: [14,0]
   starting_position_corner : true
   starting_position_random : false
-  map_config : 'empty'
 env6:
-  name: "env6: Full_Info_Non_Rand_Size15_Rand_Starting_Pose"
-  base_steps: 3000000
-  sensor: "full information"
+  name: "env6:Camera_Non_Rand_Size15_Rand_Starting_Pose"
+  base_steps: 1500000
+  sensor: "camera"
   sensor_range: 2
   size: 15
   min_size: 0
@@ -81,11 +76,10 @@ env6:
   starting_position: [14,0]
   starting_position_corner : false
   starting_position_random : true
-  map_config : 'empty'
 env7:
-  name: "env7: Full_Info_Non_Rand_Size19_Fixed_Starting_Pose"
-  base_steps: 3000000
-  sensor: "full information"
+  name: "env7:Camera_Non_Rand_Size19_Fixed_Starting_Pose"
+  base_steps: 1000000
+  sensor: "camera"
   sensor_range: 2
   size: 19
   min_size: 0
@@ -95,11 +89,10 @@ env7:
   starting_position: [19,0]
   starting_position_corner : true
   starting_position_random : false
-  map_config : 'empty'
 env8:
-  name: "env8: Full_Info_Non_Rand_Size19_Rand_Starting_Pose"
-  base_steps: 4000000
-  sensor: "full information"
+  name: "env8:Camera_Non_Rand_Size19_Rand_Starting_Pose"
+  base_steps: 1500000
+  sensor: "camera"
   sensor_range: 2
   size: 19
   min_size: 0
@@ -109,6 +102,5 @@ env8:
   starting_position: [19,0]
   starting_position_corner : false
   starting_position_random : true
-  map_config : 'empty'
 
 

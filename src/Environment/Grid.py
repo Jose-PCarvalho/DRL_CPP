@@ -175,3 +175,22 @@ class GridMap:
         # gray_scale = np.dot(new_arr, [0.299, 0.587, 0.114])
 
         return new_arr
+
+    def fix_map(self, start):
+        visited = set()
+        queue = [start]
+        while queue:
+            node = queue.pop(0)
+            visited.add(node)
+            for neighbor in self.map[node]:
+                if neighbor not in visited:
+                    queue.append(neighbor)
+        non_obs = set(self.getTiles()).difference(self.obstacle_list)
+        should_be_obs = non_obs.difference(visited)
+        for t in should_be_obs:
+            for neighbor in self.map[t]:
+                self.map[neighbor].remove(t)
+            self.map[t] = []
+            self.obstacle_list.append(t)
+
+        self.map_array = self.graph_to_array()
