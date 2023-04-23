@@ -16,10 +16,10 @@ class BackForth:
         self.counter = 0
 
     def select_action(self, obs):
-
+        obstacle_dim=1
         if len(self.wall_list) < 2:
             for d in self.dirs:
-                if obs[2][d] == 1:
+                if obs[obstacle_dim][d] == 1:
                     if d not in self.wall_list:
                         self.wall_list.append(d)
                         self.assign_actions()
@@ -28,8 +28,8 @@ class BackForth:
             a = self.action_seq[self.counter]
             if self.counter == 1 or self.counter == 3:
                 self.counter += 1
-            elif (a == Actions.NORTH and obs[2][self.north]) or (a == Actions.SOUTH and obs[2][self.south]) or \
-                    (a == Actions.EAST and obs[2][self.east]) or (a == Actions.WEST and obs[2][self.west]):
+            elif (a == Actions.NORTH and obs[obstacle_dim][self.north]) or (a == Actions.SOUTH and obs[obstacle_dim][self.south]) or \
+                    (a == Actions.EAST and obs[obstacle_dim][self.east]) or (a == Actions.WEST and obs[obstacle_dim][self.west]):
                 self.counter += 1
         if self.counter > 3:
             self.counter = 0
@@ -37,6 +37,7 @@ class BackForth:
         return action
 
     def init(self, obs,size):
+        obstacle_dim=1
         self.center = obs.shape[1] // 2
         self.north = (self.center - 1, self.center)
         self.south = (self.center + 1, self.center)
@@ -46,13 +47,13 @@ class BackForth:
         self.counter = 0
         self.wall_list = []
 
-        if obs[2][self.north] == 1:
+        if obs[obstacle_dim][self.north] == 1:
             self.wall_list.append(self.north)
-        if obs[2][self.south] == 1:
+        if obs[obstacle_dim][self.south] == 1:
             self.wall_list.append(self.south)
-        if obs[2][self.west]:
+        if obs[obstacle_dim][self.west]:
             self.wall_list.append(self.west)
-        if obs[2][self.east]:
+        if obs[obstacle_dim][self.east]:
             self.wall_list.append(self.east)
 
         self.assign_actions()

@@ -19,10 +19,10 @@ class WallFollower:
         self.counter = 0
 
     def select_action(self, obs):
-
+        obstacle_dim = 1
         if len(self.wall_list) < 2:
             for d in self.dirs:
-                if obs[2][d] == 1:
+                if obs[obstacle_dim][d] == 1:
                     if d not in self.wall_list:
                         self.wall_list.append(d)
                         self.assign_actions()
@@ -33,7 +33,7 @@ class WallFollower:
             if self.n_actions == 1 and self.counter == 3:
                 self.counter = 0
                 self.size -= 2
-                self.n_actions = self.size +1
+                self.n_actions = self.size + 1
             if self.n_actions == 0:
                 self.n_actions = self.size
                 self.counter += 1
@@ -43,6 +43,7 @@ class WallFollower:
         return action
 
     def init(self, obs, size):
+        obstacle_dim = 1
         self.center = obs.shape[1] // 2
         self.north = (self.center - 1, self.center)
         self.south = (self.center + 1, self.center)
@@ -54,13 +55,13 @@ class WallFollower:
         self.n_actions = size
         self.size = size - 1
 
-        if obs[2][self.north] == 1:
+        if obs[obstacle_dim][self.north] == 1:
             self.wall_list.append(self.north)
-        if obs[2][self.south] == 1:
+        if obs[obstacle_dim][self.south] == 1:
             self.wall_list.append(self.south)
-        if obs[2][self.west]:
+        if obs[obstacle_dim][self.west]:
             self.wall_list.append(self.west)
-        if obs[2][self.east]:
+        if obs[obstacle_dim][self.east]:
             self.wall_list.append(self.east)
 
         self.assign_actions()

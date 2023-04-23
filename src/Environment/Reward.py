@@ -3,7 +3,7 @@ from src.Environment.Actions import Events
 
 class RewardParams:
     def __init__(self, scaling, max_size=25):
-        self.blocked_reward = -0.5
+        self.blocked_reward = -1
         self.repeated_field_reward = -0.5
         self.new_tile_reward = 1.0
         self.map_complete = 0 #max_size ** 2 - scaling ** 2

@@ -80,16 +80,16 @@ parser.add_argument('--discount', type=float, default=0.99, metavar='γ', help='
 parser.add_argument('--target-update', type=int, default=int(8e3), metavar='τ',
                     help='Number of steps after which to update target network')
 parser.add_argument('--reward-clip', type=int, default=1, metavar='VALUE', help='Reward clipping (0 to disable)')
-parser.add_argument('--learning-rate', type=float, default=0.0001, metavar='η', help='Learning rate')
+parser.add_argument('--learning-rate', type=float, default=0.0000625, metavar='η', help='Learning rate')
 parser.add_argument('--adam-eps', type=float, default=1.5e-4, metavar='ε', help='Adam epsilon')
 parser.add_argument('--batch-size', type=int, default=32, metavar='SIZE', help='Batch size')
 parser.add_argument('--norm-clip', type=float, default=10, metavar='NORM', help='Max L2 norm for gradient clipping')
-parser.add_argument('--learn-start', type=int, default=int(70e3), metavar='STEPS',
+parser.add_argument('--learn-start', type=int, default=int(50e3), metavar='STEPS',
                     help='Number of steps before starting training')
 parser.add_argument('--evaluate', action='store_true', help='Evaluate only')
-parser.add_argument('--evaluation-interval', type=int, default=10000, metavar='STEPS',
+parser.add_argument('--evaluation-interval', type=int, default=25000, metavar='STEPS',
                     help='Number of training steps between evaluations')
-parser.add_argument('--evaluation-episodes', type=int, default=10, metavar='N',
+parser.add_argument('--evaluation-episodes', type=int, default=5, metavar='N',
                     help='Number of evaluation episodes to average over')
 # TODO: Note that DeepMind's evaluation method is running the latest agent for 500K frames ever every 1M steps
 parser.add_argument('--evaluation-size', type=int, default=250, metavar='N',
@@ -101,9 +101,9 @@ parser.add_argument('--checkpoint-interval', default=50000,
 parser.add_argument('--memory', help='Path to save/load the memory from')
 parser.add_argument('--disable-bzip-memory', action='store_true',
                     help='Don\'t zip the memory file. Not recommended (zipping is a bit slower and much, much smaller)')
-parser.add_argument('--config-file', type=str, default='configs/training_obstacles.yaml')
+parser.add_argument('--config-file', type=str, default='configs/training.yaml')
 parser.add_argument('--log-file', type=str, default='results/log.txt')
-parser.add_argument('--starting-episode',type=int, default=3)
+parser.add_argument('--starting-environment',type=int, default=1)
 
 # Setup
 args = parser.parse_args()
@@ -154,7 +154,7 @@ avg_overlap = 0
 retries = 0
 all_T = 0
 T = 0
-e = args.starting_episode
+e = args.starting_environment
 while e < number_envs + 1:
 
     if e > 1 and avg_overlap > 0.2:

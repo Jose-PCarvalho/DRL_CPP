@@ -164,8 +164,9 @@ class State:
             self.local_map.obstacle_list)) - 1  # height * width - 1 - obstacle_number
         self.optimal_steps = self.remaining
         self.timesteps = 0
-        self.t_to_go = self.params.size ** 2 * 10
+        self.t_to_go = self.params.size ** 2 * 5
         self.terminated = False
         self.truncated = False
         s = self.local_map.center_map(self.position.get_position())
         self.state_array = [s, s, s]
+
