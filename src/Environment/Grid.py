@@ -79,7 +79,7 @@ class GridMap:
                     a[:, i, j] = [1, 0, 0]
                 elif tile in self.obstacle_list:
                     a[:, i, j] = [0, 1, 0]
-                elif tile not in self.getTiles():
+                elif tile in (self.getTiles()) and tile not in (set(self.visited_list).union(set(self.obstacle_list))):
                     a[:, i, j] = [0, 0, 1]
         return a
 
