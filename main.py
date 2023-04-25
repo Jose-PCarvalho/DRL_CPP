@@ -54,7 +54,7 @@ def use_pseudo(ovrl):
 # Note that hyperparameters may originally be reported in ATARI game frames instead of agent steps
 parser = argparse.ArgumentParser(description='Rainbow')
 parser.add_argument('--seed', type=int, default=123, help='Random seed')
-parser.add_argument('--id', type=str, default='CPP', help='Experiment ID')
+parser.add_argument('--id', type=str, default='CPP_Paper', help='Experiment ID')
 parser.add_argument('--disable-cuda', action='store_true', help='Disable CUDA')
 parser.add_argument('--T-max', type=int, default=int(70e4), metavar='STEPS',
                     help='Number of training steps (4x number of frames)')

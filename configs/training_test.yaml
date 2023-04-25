@@ -1,14 +1,45 @@
+#env1:
+#  name: "env1: Full_Info_Non_Rand_Size5_Fixed_Starting_Pose"
+#  base_steps: 500000
+#  sensor: "full information"
+#  sensor_range: 2
+#  size: 15
+#  min_size: 0
+#  random_size: false
+#  obstacles_random: false
+#  number_obstacles: 10
+#  starting_position: [13,1]
+#  starting_position_corner : false
+#  starting_position_random : false
+#  map_config : '../maps/Map2.yaml'
+
+#env1:
+#  name: "env1: Full_Info_Non_Rand_Size5_Fixed_Starting_Pose"
+#  base_steps: 500000
+#  sensor: "full information"
+#  sensor_range: 2
+#  size: 17
+#  min_size: 0
+#  random_size: false
+#  obstacles_random: false
+#  number_obstacles: 10
+#  starting_position: [14,1]
+#  starting_position_corner : false
+#  starting_position_random : false
+#  map_config : '../maps/Map4.yaml'
+
 env1:
   name: "env1: Full_Info_Non_Rand_Size5_Fixed_Starting_Pose"
   base_steps: 500000
   sensor: "full information"
   sensor_range: 2
-  size: 10
+  size: 19
   min_size: 0
   random_size: false
   obstacles_random: false
   number_obstacles: 10
-  starting_position: [3,0]
-  starting_position_corner : true
+  starting_position: [17,1]
+  starting_position_corner : false
   starting_position_random : false
-  map_config : '../maps/test.yaml'
+  map_config : '../maps/Map5.yaml'
+

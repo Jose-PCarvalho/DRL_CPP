@@ -38,7 +38,6 @@ class Vizualization:
                     ),
                 )
 
-
         # Finally, add some gridlines
         for x in range(a.shape[1] + 1):
             pygame.draw.line(
@@ -153,9 +152,9 @@ def graph_to_RGB_array(a):
 
     for i in range(a.shape[1]):
         for j in range(a.shape[2]):
-            if a[0, i, j] == 1 :
+            if a[0, i, j] == 1:
                 rgb[:, i, j] = [255, 0, 0]
-            elif a[0, i, j] == 0 and a[1,i,j] ==0:
+            elif a[0, i, j] == 0 and a[1, i, j] == 0 and a[2, i, j] == 0:
                 rgb[:, i, j] = [255, 255, 255]
             elif a[1, i, j] == 1:
                 rgb[:, i, j] = [0, 0, 0]

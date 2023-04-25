@@ -79,7 +79,7 @@ class GridMap:
                     a[:, i, j] = [1, 0, 0]
                 elif tile in self.obstacle_list:
                     a[:, i, j] = [0, 1, 0]
-                else:
+                elif tile not in self.getTiles():
                     a[:, i, j] = [0, 0, 1]
         return a
 
@@ -117,11 +117,13 @@ class GridMap:
             # to_remove.clear()
             # remove_further = False
             for t in tiles[dir]:
+                obst = t in full_map.obstacle_list
                 if t in full_map_tiles and t not in local_map_tiles:
-                    if t in full_map.obstacle_list:
-                        self.new_tile(t, obstacle=True)
-                    else:
-                        self.new_tile(t)
+                    self.new_tile(t, obst)
+                if obst:
+                    break
+
+
         #         elif t not in full_map_tiles:
         #             to_remove.append(t)
         #
