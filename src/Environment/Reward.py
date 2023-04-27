@@ -60,8 +60,8 @@ class GridRewards:
             self.overlap += 1
             self.overlap_counter += 1
             if self.overlap_counter > 3:
-                if self.last_action_array[0] == self.last_action_array[2] and self.last_action_array[1] == \
-                        self.last_action_array[3]:
+                if self.last_position_array[0] == self.last_position_array[2] and self.last_position_array[1] == \
+                        self.last_position_array[3]:
                     r += self.params.repeating_two_moves
 
         if Events.BLOCKED in events:
