@@ -6,11 +6,12 @@ class RewardParams:
         self.blocked_reward = -1
         self.repeated_field_reward = -0.5
         self.new_tile_reward = 1.0
-        self.map_complete = 0 #max_size ** 2 - scaling ** 2
-        self.timeout = -10 #scaling ** 2
+        self.map_complete = 0  # max_size ** 2 - scaling ** 2
+        self.timeout = -10  # scaling ** 2
         self.close_to_wall_reward = 1.0
         self.repeated_action_reward = 1.0
         self.finished_row_col = 1.0
+        self.repeating_two_moves = -1.0
 
 
 class GridRewards:
@@ -19,6 +20,8 @@ class GridRewards:
         self.cumulative_reward: float = 0.0
         self.overlap = 0
         self.steps = 0
+        self.overlap_counter = 0
+        self.last_position_array = [(-1, -1), (-1, -1), (-1, -1), (-1, -1)]
 
     def get_cumulative_reward(self):
         return self.cumulative_reward
@@ -31,12 +34,16 @@ class GridRewards:
         self.overlap = 0
         self.steps = 0
         self.params.scaling_factor = 1  # scaling ** 2
+        self.overlap_counter = 0
 
-    def compute_reward(self, events):
+    def compute_reward(self, events, pos):
         r = 0
         self.steps += 1
+        self.last_position_array.append(pos),
+        self.last_position_array.pop(0)
         if Events.NEW in events:
             r += self.params.new_tile_reward
+            self.overlap_counter = 0
             # if Events.REPEATED in events:
             #      r += self.params.repeated_action_reward * self.params.scaling_factor
 
@@ -51,6 +58,12 @@ class GridRewards:
         else:
             r += self.params.repeated_field_reward
             self.overlap += 1
+            self.overlap_counter += 1
+            if self.overlap_counter > 3:
+                if self.last_action_array[0] == self.last_action_array[2] and self.last_action_array[1] == \
+                        self.last_action_array[3]:
+                    r += self.params.repeating_two_moves
+
         if Events.BLOCKED in events:
             r += self.params.blocked_reward
         if Events.FINISHED in events:

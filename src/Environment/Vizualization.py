@@ -155,7 +155,7 @@ def graph_to_RGB_array(a):
             if a[0, i, j] == 1:
                 rgb[:, i, j] = [255, 0, 0]
             elif a[0, i, j] == 0 and a[1, i, j] == 0 and a[2, i, j] == 0:
-                rgb[:, i, j] = [0, 0, 255]
+                rgb[:, i, j] = [0,0,255]
             elif a[1, i, j] == 1:
                 rgb[:, i, j] = [0, 0, 0]
             elif a[2, i, j] == 1:
