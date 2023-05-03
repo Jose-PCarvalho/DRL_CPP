@@ -45,7 +45,6 @@ def save_memory(memory, memory_path, disable_bzip):
 def use_pseudo(ovrl):
     p = -1.4 * (1 - ovrl) + 0.7
     eps = np.random.random()
-    return False
     if eps < p:
         return True
     else:
