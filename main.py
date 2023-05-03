@@ -81,7 +81,7 @@ parser.add_argument('--discount', type=float, default=0.99, metavar='γ', help='
 parser.add_argument('--target-update', type=int, default=int(8e3), metavar='τ',
                     help='Number of steps after which to update target network')
 parser.add_argument('--reward-clip', type=int, default=1, metavar='VALUE', help='Reward clipping (0 to disable)')
-parser.add_argument('--learning-rate', type=float, default=0.0000625, metavar='η', help='Learning rate')
+parser.add_argument('--learning-rate', type=float, default=0.0001, metavar='η', help='Learning rate')
 parser.add_argument('--adam-eps', type=float, default=1.5e-4, metavar='ε', help='Adam epsilon')
 parser.add_argument('--batch-size', type=int, default=32, metavar='SIZE', help='Batch size')
 parser.add_argument('--norm-clip', type=float, default=10, metavar='NORM', help='Max L2 norm for gradient clipping')
