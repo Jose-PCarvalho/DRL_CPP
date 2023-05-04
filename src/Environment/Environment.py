@@ -23,7 +23,7 @@ class Environment:
 
     def reset(self):
         self.state.init_episode()
-        self.rewards.reset(self.state.params.real_size)
+        self.rewards.reset(self.state)
         return self.get_observation(), self.get_info()
 
     def step(self, action):

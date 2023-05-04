@@ -31,7 +31,6 @@ class GridMap:
 
     @staticmethod
     def adjacentTiles(tile):
-
         return [(tile[0] + 1, tile[1]), (tile[0] - 1, tile[1]), (tile[0], tile[1] + 1), (tile[0], tile[1] - 1)]
 
     def getTiles(self):
@@ -104,45 +103,15 @@ class GridMap:
             tiles["down-right"].append((tile[0] + i, tile[1] + i))
             tiles["down-left"].append((tile[0] + i, tile[1] - i))
         directions = tiles.keys()
-        to_remove = []
-        obstacles = []
         full_map_tiles = full_map.getTiles()
         local_map_tiles = self.getTiles()
-        # for dir in directions:
-        #     if tiles[dir][0] not in full_map_tiles or tiles[dir][0] in full_map.obstacle_list:
-        #         obstacles.append(True)
-        #     else:
-        #         obstacles.append(False)
         for dir in directions:
-            # to_remove.clear()
-            # remove_further = False
             for t in tiles[dir]:
                 obst = t in full_map.obstacle_list
                 if t in full_map_tiles and t not in local_map_tiles:
                     self.new_tile(t, obst)
                 if obst:
                     break
-
-
-        #         elif t not in full_map_tiles:
-        #             to_remove.append(t)
-        #
-        #         if t in (self.visited_list + self.obstacle_list) or (remove_further and t in full_map_tiles):
-        #             to_remove.append(t)
-        #             remove_further = True
-        #     for rem in to_remove:
-        #         if rem in tiles[dir]:
-        #             tiles[dir].remove(rem)
-        # ranges = []
-        # for dir in directions:
-        #     ranges.append(len(tiles[dir]))
-        #
-        # for n in range(len(ranges)):
-        #     if ranges[n] == 0 and obstacles[n] == True:
-        #         ranges[n] = -1
-        #
-        # return ranges
-
     def camera(self, tile, full_map, r):
         tiles = []
         for i in range(-r, r + 1):
@@ -171,9 +140,6 @@ class GridMap:
 
         # copy the original array to the center of the new array
         new_arr[:, start_i:end_i, start_j:end_j] = self.map_array
-
-        # gray_scale = np.dot(new_arr, [0.299, 0.587, 0.114])
-
         return new_arr
 
     def fix_map(self, start):
