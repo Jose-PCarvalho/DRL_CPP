@@ -17,13 +17,15 @@ class RewardParams:
 
 class GridRewards:
     def __init__(self, scaling):
+        self.last_remaining_potential = None
+        self.last_closest = None
         self.params = scaling
         self.cumulative_reward: float = 0.0
         self.overlap = 0
         self.steps = 0
         self.total_steps = None
         self.remaining = None
-        self.last_potential = None
+        self.closest = None
 
     def get_cumulative_reward(self):
         return self.cumulative_reward
@@ -38,16 +40,20 @@ class GridRewards:
         self.params.scaling_factor = 1  # scaling ** 2
         self.total_steps = state.remaining
         self.remaining = state.remaining
-        self.last_potential = -self.remaining / self.total_steps
+        self.last_remaining_potential = -self.remaining / self.total_steps
+        self.closest = -state.local_map.min_manhattan_distance(state.position.get_position())
 
     def compute_reward(self, events, state: State):
         r = 0
         self.steps += 1
         self.remaining = state.remaining
+        new_remaining_potential = - self.remaining / self.total_steps
+        new_closest = -state.local_map.min_manhattan_distance(state.position.get_position())
         if Events.NEW in events:
             r += self.params.new_tile_reward
         else:
             r += self.params.repeated_field_reward
+            r += new_closest - self.closest
             self.overlap += 1
         if Events.BLOCKED in events:
             r += self.params.blocked_reward
@@ -55,9 +61,9 @@ class GridRewards:
             r += self.params.map_complete
         if Events.TIMEOUT in events:
             r += self.params.timeout
-        new_potential = - self.remaining / self.total_steps
-        r += new_potential - self.last_potential
-        self.last_potential = new_potential
+        r += new_remaining_potential - self.last_remaining_potential
+        self.last_remaining_potential = new_remaining_potential
+        self.closest = new_closest
         self.cumulative_reward += r
 
         return r

@@ -28,7 +28,7 @@ class Environment:
 
     def step(self, action):
         events = self.state.move_agent(Actions(action))
-        reward = self.rewards.compute_reward(events, self.state.position.get_position())
+        reward = self.rewards.compute_reward(events, self.state)
         return self.get_observation(), reward, self.state.terminated, self.state.truncated, self.get_info()
 
     def action_space(self):

@@ -1,21 +1,34 @@
 import itertools
 
 from src.Environment.Environment import *
-from src.Environment.Grid import *
-import numpy as np
-from PIL import Image
-from src.Environment.State import *
+
 from src.Environment.Actions import *
 from src.Environment.Vizualization import *
+from src.Environment.WallFollowing import *
 import random
-env = Environment(EnvironmentParams())
+import yaml
+
+with open('../configs/training.yaml', 'rb') as f:
+    conf = yaml.safe_load(f.read())  # load the config file
+
+env = Environment(EnvironmentParams(conf['env1']))
 Viz = Vizualization()
+agent = WallFollower()
 while True:
-    env.reset()
+    observation, _ = env.reset()
+    env.render()
+    agent.init(observation[0][-1], env.state.params.size)
     for t in itertools.count():
+        action = agent.select_action(observation[0][-1])
         observation_, reward, done, truncated, info = env.step(random.choice(list(Actions)))
-        print(reward)
-        #print(env.state.remaining)
+        # print(action)
+        # print(env.state.remaining)
         env.render()
+
+        observation = observation_
         if done or truncated:
             break
+
+
+
+

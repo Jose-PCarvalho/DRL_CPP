@@ -112,6 +112,7 @@ class GridMap:
                     self.new_tile(t, obst)
                 if obst:
                     break
+
     def camera(self, tile, full_map, r):
         tiles = []
         for i in range(-r, r + 1):
@@ -167,3 +168,13 @@ class GridMap:
                 self.dfs(neighbor, visited)
 
         return visited
+
+    def min_manhattan_distance(self, pos):
+        not_seen_list = set(self.getTiles()).difference(set(self.visited_list).union(set(self.obstacle_list)))
+        if len(not_seen_list) == 0:
+            return 0
+        distances = np.array(list(not_seen_list))
+        distances = distances - pos
+        distances = np.linalg.norm(distances, ord=1, axis=1)
+        dist = min(distances) - 1
+        return dist
