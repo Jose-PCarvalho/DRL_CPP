@@ -168,5 +168,5 @@ class State:
         self.terminated = False
         self.truncated = False
         s = self.local_map.center_map(self.position.get_position())
-        self.state_array = [s, s, s]
+        self.state_array = [s]
 
