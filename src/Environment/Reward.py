@@ -53,7 +53,7 @@ class GridRewards:
             r += self.params.new_tile_reward
         else:
             r += self.params.repeated_field_reward
-            r += new_closest - self.closest
+            r += 0.25*(new_closest - self.closest)
             self.overlap += 1
         if Events.BLOCKED in events:
             r += self.params.blocked_reward
