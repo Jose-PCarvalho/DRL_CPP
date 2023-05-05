@@ -52,7 +52,7 @@ class GridRewards:
         if Events.NEW in events:
             r += self.params.new_tile_reward
         else:
-            r += self.params.repeated_field_reward
+            #r += self.params.repeated_field_reward
             r += 0.25*(new_closest - self.closest)
             self.overlap += 1
         if Events.BLOCKED in events:
@@ -61,6 +61,7 @@ class GridRewards:
             r += self.params.map_complete
         if Events.TIMEOUT in events:
             r += self.params.timeout
+        r += self.params.repeated_field_reward
         r += new_remaining_potential - self.last_remaining_potential
         self.last_remaining_potential = new_remaining_potential
         self.closest = new_closest
