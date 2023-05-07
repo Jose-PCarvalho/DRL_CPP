@@ -65,7 +65,7 @@ class DQN(nn.Module):
             self.conv_output_size = self._get_conv_out([12, 49, 49])
         elif args.architecture == 'data-efficient':
             self.convs = nn.Sequential(nn.Conv2d(3, 16, 3, stride=1, padding='same'), nn.LeakyReLU(),
-                                       nn.Conv2d(16, 32, 3, stride=2, padding=1), nn.LeakyReLU(),  # stride 1
+                                       nn.Conv2d(16, 32, 3, stride=2), nn.LeakyReLU(),  # stride 1
                                        nn.Conv2d(32, 64, 3, stride=2),nn.LeakyReLU())  # kernel size 3 , stride 2, stable version had kernel 4
             self.conv_output_size = self._get_conv_out([3, 37, 37])
         self.fc_h_v = NoisyLinear(self.conv_output_size + 1, args.hidden_size, std_init=args.noisy_std)

@@ -184,7 +184,7 @@ while e < number_envs + 1:
             state, info = env.reset()
 
         next_state, _, done, truncated, info = env.step(np.random.randint(0, action_space))
-        val_mem.append(state[0], state[1], -1, 0.0, done or truncated)
+        val_mem.append(state[0], state[1], -1, 0.0, done , truncated)
         state = next_state
         T += 1
 
@@ -221,7 +221,7 @@ while e < number_envs + 1:
 
             next_state, reward, done, truncated, info = env.step(action)  # Step
 
-            mem.append(state[0], state[1], action, reward, done or truncated)  # Append transition to memory
+            mem.append(state[0], state[1], action, reward, done , truncated)  # Append transition to memory
 
             # Train and test
             if T >= args.learn_start:

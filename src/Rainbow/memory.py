@@ -111,12 +111,12 @@ class ReplayMemory():
             capacity)  # Store transitions in a wrap-around cyclic buffer within a sum tree for querying priorities
 
     # Adds state and action at time t, reward and terminal at time t + 1
-    def append(self, state, battery, action, reward, terminal):
+    def append(self, state, battery, action, reward, terminal, truncated):
         state = torch.tensor(state[-1], dtype=torch.uint8, device=torch.device('cpu'))
         battery = torch.tensor(battery, dtype=torch.int32, device=torch.device('cpu'))
         self.transitions.append((self.t, state, battery, action, reward, not terminal),
                                 self.transitions.max)  # Store new transition with maximum priority
-        self.t = 0 if terminal else self.t + 1  # Start new episodes with t = 0
+        self.t = 0 if terminal or truncated else self.t + 1  # Start new episodes with t = 0
 
     # Returns the transitions with blank states where appropriate
     def _get_transitions(self, idxs):
