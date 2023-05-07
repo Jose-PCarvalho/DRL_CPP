@@ -87,12 +87,12 @@ parser.add_argument('--norm-clip', type=float, default=10, metavar='NORM', help=
 parser.add_argument('--learn-start', type=int, default=int(50e3), metavar='STEPS',
                     help='Number of steps before starting training')
 parser.add_argument('--evaluate', action='store_true', help='Evaluate only')
-parser.add_argument('--evaluation-interval', type=int, default=25000, metavar='STEPS',
+parser.add_argument('--evaluation-interval', type=int, default=35000, metavar='STEPS',
                     help='Number of training steps between evaluations')
 parser.add_argument('--evaluation-episodes', type=int, default=5, metavar='N',
                     help='Number of evaluation episodes to average over')
 # TODO: Note that DeepMind's evaluation method is running the latest agent for 500K frames ever every 1M steps
-parser.add_argument('--evaluation-size', type=int, default=250, metavar='N',
+parser.add_argument('--evaluation-size', type=int, default=500, metavar='N',
                     help='Number of transitions to use for validating Q')
 parser.add_argument('--render', action='store_true', help='Display screen (testing only)')
 parser.add_argument('--enable-cudnn', action='store_true', help='Enable cuDNN (faster but nondeterministic)')

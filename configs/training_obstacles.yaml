@@ -1,75 +1,33 @@
 env1:
-  name: "env1_Full_Info_Non_Rand_Size5_Fixed_Starting_Pose_Obstacle"
-  base_steps: 500000
+  name: "env1_Full_Info_Non_Rand_Size5_Rand_Starting_Pose_Obstacle"
+  base_steps: 1000000
   sensor: "full information"
   sensor_range: 2
   size: 5
   min_size: 0
   random_size: false
   obstacles_random: true
-  number_obstacles: 2
-  starting_position: [3,0]
-  starting_position_corner : true
-  starting_position_random : false
-  map_config : 'empty'
-env2:
-  name: "env2_Full_Info_Non_Rand_Size5_Rand_Starting_Pose_Obstacle"
-  base_steps: 800000
-  sensor: "full information"
-  sensor_range: 2
-  size: 5
-  min_size: 0
-  random_size: false
-  obstacles_random: true
-  number_obstacles: 2
+  number_obstacles: 5
   starting_position: [0,4]
   starting_position_corner : false
   starting_position_random : true
   map_config : 'empty'
-env3:
-  name: "env3_Full_Info_Non_Rand_Size10_Fixed_Starting_Pose_Obstacle"
-  base_steps: 800000
+env2:
+  name: "env2_Full_Info_Non_Rand_Size10_Rand_Starting_Pose_Obstacle"
+  base_steps: 1500000
   sensor: "full information"
   sensor_range: 2
   size: 10
-  min_size: 0
-  random_size: false
-  obstacles_random: true
-  number_obstacles: 5
-  starting_position: [9,0]
-  starting_position_corner : true
-  starting_position_random : false
-  map_config : 'empty'
-env4:
-  name: "env4_Full_Info_Non_Rand_Size10_Rand_Starting_Pose_Obstacle"
-  base_steps: 1000000
-  sensor: "full information"
-  sensor_range: 2
-  size: 10
-  min_size: 0
-  random_size: false
-  obstacles_random: true
-  number_obstacles: 5
-  starting_position: [9,0]
-  starting_position_corner : false
-  starting_position_random : true
-  map_config : 'empty'
-env5:
-  name: "env5_Full_Info_Non_Rand_Size15_Fixed_Starting_Pose_Obstacle"
-  base_steps: 800000
-  sensor: "full information"
-  sensor_range: 2
-  size: 15
   min_size: 0
   random_size: false
   obstacles_random: true
   number_obstacles: 10
-  starting_position: [14,0]
-  starting_position_corner : true
-  starting_position_random : false
+  starting_position: [9,0]
+  starting_position_corner : false
+  starting_position_random : true
   map_config : 'empty'
-env6:
-  name: "env6_Full_Info_Non_Rand_Size15_Rand_Starting_Pose_Obstacle"
+env3:
+  name: "env3_Full_Info_Non_Rand_Size15_Rand_Starting_Pose_Obstacle"
   base_steps: 1500000
   sensor: "full information"
   sensor_range: 2
@@ -77,27 +35,13 @@ env6:
   min_size: 0
   random_size: false
   obstacles_random: true
-  number_obstacles: 10
+  number_obstacles: 20
   starting_position: [14,0]
   starting_position_corner : false
   starting_position_random : true
   map_config : 'empty'
-env7:
-  name: "env7_Full_Info_Non_Rand_Size19_Fixed_Starting_Pose_Obstacle"
-  base_steps: 1000000
-  sensor: "full information"
-  sensor_range: 2
-  size: 19
-  min_size: 0
-  random_size: false
-  obstacles_random: true
-  number_obstacles: 15
-  starting_position: [19,0]
-  starting_position_corner : true
-  starting_position_random : false
-  map_config : 'empty'
-env8:
-  name: "env8_Full_Info_Non_Rand_Size19_Rand_Starting_Pose_Obstacle"
+env4:
+  name: "env4_Full_Info_Non_Rand_Size19_Rand_Starting_Pose_Obstacle"
   base_steps: 10000000
   sensor: "full information"
   sensor_range: 2
@@ -105,12 +49,12 @@ env8:
   min_size: 0
   random_size: false
   obstacles_random: true
-  number_obstacles: 15
+  number_obstacles: 30
   starting_position: [19,0]
   starting_position_corner : false
   starting_position_random : true
   map_config : 'empty'
-env9:
+env5:
   name: "Final Boss"
   base_steps: 10000000
   sensor: "full information"

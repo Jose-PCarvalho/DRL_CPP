@@ -130,6 +130,6 @@ class Agent:
 
     def update_C51(self, size):
         self.Vmin = -size**2-size
-        self.Vmax = size**2+size
+        self.Vmax = size**2/2+size
         self.support = torch.linspace(self.Vmin, self.Vmax, self.atoms).to(device=self.device)  # Support (range) of z
         self.delta_z = (self.Vmax - self.Vmin) / (self.atoms - 1)
