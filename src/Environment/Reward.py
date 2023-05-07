@@ -61,7 +61,7 @@ class GridRewards:
             r += self.params.map_complete
         if Events.TIMEOUT in events:
             r += self.params.timeout
-        r += self.params.repeated_field_reward/2
+        r += self.params.repeated_field_reward
         r += new_remaining_potential - self.last_remaining_potential
         self.last_remaining_potential = new_remaining_potential
         self.closest = new_closest
