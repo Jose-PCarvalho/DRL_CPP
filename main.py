@@ -101,9 +101,9 @@ parser.add_argument('--checkpoint-interval', default=50000,
 parser.add_argument('--memory', help='Path to save/load the memory from')
 parser.add_argument('--disable-bzip-memory', action='store_true',
                     help='Don\'t zip the memory file. Not recommended (zipping is a bit slower and much, much smaller)')
-parser.add_argument('--config-file', type=str, default='configs/training.yaml')
+parser.add_argument('--config-file', type=str, default='configs/training_obstacles.yaml')
 parser.add_argument('--log-file', type=str, default='results/log.txt')
-parser.add_argument('--starting-environment',type=int, default=1)
+parser.add_argument('--starting-environment', type=int, default=1)
 
 # Setup
 args = parser.parse_args()
@@ -184,7 +184,7 @@ while e < number_envs + 1:
             state, info = env.reset()
 
         next_state, _, done, truncated, info = env.step(np.random.randint(0, action_space))
-        val_mem.append(state[0], state[1], -1, 0.0, done , truncated)
+        val_mem.append(state[0], state[1], -1, 0.0, done, truncated)
         state = next_state
         T += 1
 
@@ -198,10 +198,12 @@ while e < number_envs + 1:
         # Training loop
         dqn.train()
         done = True
-        truncated = True
+        truncated = False
+        last_truncated = False
         for T in trange(1, args.T_max + 1):
 
             if done or truncated:
+                last_truncated = truncated
                 state, _ = env.reset()
                 pseudo_episode = False
                 if use_pseudo_agent and avg_overlap > 0.5:
@@ -215,13 +217,16 @@ while e < number_envs + 1:
                 dqn.reset_noise()  # Draw a new set of noisy weights
 
             if not pseudo_episode:
-                action = dqn.act(state[0], state[1])
+                if last_truncated and np.random.random() < 0.5:
+                    action = env.get_heuristic_action().value
+                else:
+                    action = dqn.act(state[0], state[1])
             else:
                 action = pseudo_agent.select_action(state[0][-1]).value
 
             next_state, reward, done, truncated, info = env.step(action)  # Step
 
-            mem.append(state[0], state[1], action, reward, done , truncated)  # Append transition to memory
+            mem.append(state[0], state[1], action, reward, done, truncated)  # Append transition to memory
 
             # Train and test
             if T >= args.learn_start:

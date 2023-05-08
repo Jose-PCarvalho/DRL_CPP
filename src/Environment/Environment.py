@@ -22,7 +22,10 @@ class Environment:
         self.params = params.state_params
 
     def reset(self):
-        self.state.init_episode()
+        if self.state.truncated:
+            self.state.partial_reset()
+        else:
+            self.state.init_episode()
         self.rewards.reset(self.state)
         return self.get_observation(), self.get_info()
 
@@ -43,3 +46,19 @@ class Environment:
 
     def get_info(self):
         return {}
+
+    def get_heuristic_action(self):
+        closest = self.state.local_map.min_manhattan_distance(self.state.position.get_position())[1]
+        path = self.state.local_map.dijkstra_search(self.state.position.get_position(), (closest[0],closest[1]))
+        next = path[0]
+        diff = np.array(next) - np.array(self.state.position.get_position())
+        diff = (diff[0],diff[1])
+        if diff == (1, 0):
+            return Actions.SOUTH
+        elif diff == (-1, 0):
+            return Actions.NORTH
+        if diff == (0, 1):
+            return Actions.EAST
+        if diff == (0, -1):
+            return Actions.WEST
+

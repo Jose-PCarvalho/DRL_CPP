@@ -1,5 +1,20 @@
 import numpy as np
 from math import ceil
+import heapq
+
+
+class PriorityQueue:
+    def __init__(self):
+        self.elements = []
+
+    def empty(self):
+        return not self.elements
+
+    def put(self, item, priority: float):
+        heapq.heappush(self.elements, (priority, item))
+
+    def get(self):
+        return heapq.heappop(self.elements)[1]
 
 
 class GridMap:
@@ -169,12 +184,48 @@ class GridMap:
 
         return visited
 
-    def min_manhattan_distance(self, pos):
+    def min_manhattan_distance(self, agent_pos):
         not_seen_list = set(self.getTiles()).difference(set(self.visited_list).union(set(self.obstacle_list)))
         if len(not_seen_list) == 0:
-            return 0
-        distances = np.array(list(not_seen_list))
-        distances = distances - pos
+            return 0 , [0,0]
+        positions = np.array(list(not_seen_list))
+        distances = positions - agent_pos
         distances = np.linalg.norm(distances, ord=1, axis=1)
         dist = min(distances) - 1
-        return dist
+        dist_idx = np.argmin(distances)
+        closest = positions[dist_idx]
+        return dist, closest
+
+    def dijkstra_search(self, start, finish):
+        frontier = PriorityQueue()
+        frontier.put(start, 0)
+        came_from = {start: None}
+        cost_so_far = {start: 0}
+
+        while not frontier.empty():
+            current = frontier.get()
+
+            if current == finish:
+                break
+
+            for next in self.map[current]:
+                new_cost = cost_so_far[current] + 1
+                if next not in cost_so_far or new_cost < cost_so_far[next]:
+                    cost_so_far[next] = new_cost
+                    priority = new_cost
+                    frontier.put(next, priority)
+                    came_from[next] = current
+
+        return self.reconstruct_path(came_from, start, finish)
+
+    @staticmethod
+    def reconstruct_path(came_from, start, finish):
+        current = finish
+        path = []
+        if finish not in came_from.keys():  # no path was found
+            return []
+        while current != start:
+            path.append(current)
+            current = came_from[current]
+        path.reverse()  # optional
+        return path

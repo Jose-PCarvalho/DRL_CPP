@@ -41,14 +41,14 @@ class GridRewards:
         self.total_steps = state.remaining
         self.remaining = state.remaining
         self.last_remaining_potential = -self.remaining #/ self.total_steps
-        self.closest = -state.local_map.min_manhattan_distance(state.position.get_position())
+        self.closest = -state.local_map.min_manhattan_distance(state.position.get_position())[0]
 
     def compute_reward(self, events, state: State):
         r = 0
         self.steps += 1
         self.remaining = state.remaining
         new_remaining_potential = - self.remaining #/ self.total_steps
-        new_closest = -state.local_map.min_manhattan_distance(state.position.get_position())
+        new_closest = -state.local_map.min_manhattan_distance(state.position.get_position())[0]
         if Events.NEW in events:
             r += self.params.new_tile_reward
         else:

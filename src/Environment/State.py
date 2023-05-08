@@ -170,3 +170,10 @@ class State:
         s = self.local_map.center_map(self.position.get_position())
         self.state_array = [s]
 
+    def partial_reset(self):
+        self.t_to_go = self.params.size ** 2 * 2
+        self.terminated = False
+        self.truncated = False
+        s = self.local_map.center_map(self.position.get_position())
+        self.state_array = [s]
+
