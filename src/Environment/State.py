@@ -87,9 +87,6 @@ class State:
             self.local_map.visit_tile((self.position.x, self.position.y))
             self.remaining -= 1
             events.append(Events.NEW)
-            if self.remaining <= 0:
-                self.terminated = True
-                events.append(Events.FINISHED)
 
         if action == self.last_action:
             events.append(Events.REPEATED)
@@ -107,6 +104,10 @@ class State:
         if self.t_to_go <= 0:
             self.truncated = True
             events.append(Events.TIMEOUT)
+
+        if self.remaining < 1:
+            self.terminated = True
+            events.append(Events.FINISHED)
         return events
 
     def init_episode(self):
@@ -146,7 +147,7 @@ class State:
                         obstacles += 1
 
         self.global_map = GridMap(mapa)
-        if self.params.map_data is not None or self.params.number_obstacles>0:
+        if self.params.map_data is not None or self.params.number_obstacles > 0:
             self.global_map.fix_map(self.position.get_position())
         if self.params.sensor == "full information":
             self.local_map = self.global_map
@@ -162,6 +163,8 @@ class State:
 
         self.remaining = len(set(self.global_map.getTiles()).difference(
             self.global_map.obstacle_list)) - 1  # height * width - 1 - obstacle_number
+        if self.remaining < 1:
+            self.init_episode()
         self.optimal_steps = self.remaining
         self.timesteps = 0
         self.t_to_go = self.params.size ** 2 * 10
@@ -176,4 +179,5 @@ class State:
         self.truncated = False
         s = self.local_map.center_map(self.position.get_position())
         self.state_array = [s]
-
+        if self.remaining < 1:
+            self.init_episode()

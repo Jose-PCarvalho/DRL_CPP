@@ -50,6 +50,8 @@ class Environment:
     def get_heuristic_action(self):
         closest = self.state.local_map.min_manhattan_distance(self.state.position.get_position())[1]
         path = self.state.local_map.dijkstra_search(self.state.position.get_position(), (closest[0],closest[1]))
+        if len(path)==0:
+            print('wtf')
         next = path[0]
         diff = np.array(next) - np.array(self.state.position.get_position())
         diff = (diff[0],diff[1])
