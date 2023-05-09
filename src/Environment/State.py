@@ -1,5 +1,7 @@
 import time
 
+from numpy import ceil
+
 from src.Environment.Actions import Actions, Events
 import random
 import numpy as np
@@ -29,6 +31,7 @@ class StateParams:
         self.real_size = None
         self.sensor_range = args['sensor_range']
         self.sensor = args['sensor']
+        self.random_coverage = args['random_coverage']
         if args['map_config'] != 'empty':
             with open(args['map_config'], 'r') as file:
                 yaml_data = yaml.safe_load(file)
@@ -155,6 +158,11 @@ class State:
             self.local_map = GridMap(start=self.position.get_position())
 
         self.local_map.visit_tile(self.position.get_position())
+        if self.params.random_coverage and np.random.random() < 0.5:
+            for i in range(0, random.randint(0, ceil(self.params.size ** 2 / 2))):
+                tile = (random.randint(0, self.params.size-1), random.randint(0, self.params.size-1))
+                if tile not in self.local_map.visited_list and tile in set(self.global_map.getTiles()).difference(self.global_map.obstacle_list):
+                    self.local_map.visit_tile(tile)
 
         if self.params.sensor == "laser":
             self.local_map.laser_scanner(self.position.get_position(), self.global_map, self.params.sensor_range)
@@ -162,7 +170,7 @@ class State:
             self.local_map.camera(self.position.get_position(), self.global_map, self.params.sensor_range)
 
         self.remaining = len(set(self.global_map.getTiles()).difference(
-            self.global_map.obstacle_list)) - 1  # height * width - 1 - obstacle_number
+            self.global_map.obstacle_list)) - len(self.local_map.visited_list)  # height * width - 1 - obstacle_number
         if self.remaining < 1:
             self.init_episode()
         self.optimal_steps = self.remaining

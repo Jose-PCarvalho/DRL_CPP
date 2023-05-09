@@ -12,6 +12,7 @@ env1:
   starting_position_corner : false
   starting_position_random : true
   map_config : 'empty'
+  random_coverage : true
 env2:
   name: "env2_Full_Info_Non_Rand_Size10_Rand_Starting_Pose_Obstacle"
   base_steps: 2500000
@@ -26,6 +27,7 @@ env2:
   starting_position_corner : false
   starting_position_random : true
   map_config : 'empty'
+  random_coverage : true
 env3:
   name: "env3_Full_Info_Non_Rand_Size15_Rand_Starting_Pose_Obstacle"
   base_steps: 2500000
@@ -40,6 +42,7 @@ env3:
   starting_position_corner : false
   starting_position_random : true
   map_config : 'empty'
+  random_coverage : true
 env4:
   name: "env4_Full_Info_Non_Rand_Size19_Rand_Starting_Pose_Obstacle"
   base_steps: 10000000
@@ -54,6 +57,7 @@ env4:
   starting_position_corner : false
   starting_position_random : true
   map_config : 'empty'
+  random_coverage : true
 env5:
   name: "Final Boss"
   base_steps: 10000000
@@ -68,5 +72,6 @@ env5:
   starting_position_corner : false
   starting_position_random : true
   map_config : 'empty'
+  random_coverage : true
 
 
