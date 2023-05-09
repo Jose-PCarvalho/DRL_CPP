@@ -75,7 +75,7 @@ parser.add_argument('--priority-exponent', type=float, default=0.5, metavar='ω'
                     help='Prioritised experience replay exponent (originally denoted α)')
 parser.add_argument('--priority-weight', type=float, default=0.4, metavar='β',
                     help='Initial prioritised experience replay importance sampling weight')
-parser.add_argument('--multi-step', type=int, default=5, metavar='n', help='Number of steps for multi-step return')
+parser.add_argument('--multi-step', type=int, default=3, metavar='n', help='Number of steps for multi-step return')
 parser.add_argument('--discount', type=float, default=0.9999, metavar='γ', help='Discount factor')
 parser.add_argument('--target-update', type=int, default=int(8e3), metavar='τ',
                     help='Number of steps after which to update target network')
@@ -87,7 +87,7 @@ parser.add_argument('--norm-clip', type=float, default=10, metavar='NORM', help=
 parser.add_argument('--learn-start', type=int, default=int(50e3), metavar='STEPS',
                     help='Number of steps before starting training')
 parser.add_argument('--evaluate', action='store_true', help='Evaluate only')
-parser.add_argument('--evaluation-interval', type=int, default=35000, metavar='STEPS',
+parser.add_argument('--evaluation-interval', type=int, default=25000, metavar='STEPS',
                     help='Number of training steps between evaluations')
 parser.add_argument('--evaluation-episodes', type=int, default=5, metavar='N',
                     help='Number of evaluation episodes to average over')
@@ -217,7 +217,7 @@ while e < number_envs + 1:
                 dqn.reset_noise()  # Draw a new set of noisy weights
 
             if not pseudo_episode:
-                if last_truncated and np.random.random() < 0.25:
+                if last_truncated and np.random.random() < 0.9:
                     action = env.get_heuristic_action().value
                 else:
                     action = dqn.act(state[0], state[1])
