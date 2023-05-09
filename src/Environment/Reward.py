@@ -31,7 +31,7 @@ class GridRewards:
         return self.cumulative_reward
 
     def get_overlap(self):
-        return self.overlap / (self.steps - self.overlap)
+        return self.overlap / (self.steps - self.overlap + 1)
 
     def reset(self, state: State):
         self.cumulative_reward = 0
