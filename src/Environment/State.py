@@ -175,7 +175,7 @@ class State:
             self.init_episode()
         self.optimal_steps = self.remaining
         self.timesteps = 0
-        self.t_to_go = self.params.size ** 2 * 10
+        self.t_to_go = self.params.size ** 2 * 4
         self.terminated = False
         self.truncated = False
         s = self.local_map.center_map(self.position.get_position())
