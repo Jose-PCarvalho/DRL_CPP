@@ -31,7 +31,7 @@ class GridRewards:
         return self.cumulative_reward
 
     def get_overlap(self):
-        return self.overlap / (self.steps - self.overlap + 1)
+        return self.overlap/self.steps #self.overlap / (self.steps - self.overlap + 1)
 
     def reset(self, state: State):
         self.cumulative_reward = 0
@@ -53,7 +53,7 @@ class GridRewards:
             r += self.params.new_tile_reward
         else:
             # r += self.params.repeated_field_reward
-            r += 0.25 * (new_closest - self.closest)
+            r += 0.125 * (new_closest - self.closest)
             self.overlap += 1
         if Events.BLOCKED in events:
             r += self.params.blocked_reward
@@ -61,7 +61,7 @@ class GridRewards:
             r += self.params.map_complete
         if Events.TIMEOUT in events:
             r += self.params.timeout
-        r += self.params.repeated_field_reward
+        r += self.params.repeated_field_reward/2
         r += new_remaining_potential - self.last_remaining_potential
         self.last_remaining_potential = new_remaining_potential
         self.closest = new_closest

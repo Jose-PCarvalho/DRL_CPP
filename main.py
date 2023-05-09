@@ -217,7 +217,7 @@ while e < number_envs + 1:
                 dqn.reset_noise()  # Draw a new set of noisy weights
 
             if not pseudo_episode:
-                if last_truncated and np.random.random() < 0.5:
+                if last_truncated and np.random.random() < 0.25:
                     action = env.get_heuristic_action().value
                 else:
                     action = dqn.act(state[0], state[1])
