@@ -159,8 +159,8 @@ class State:
 
         self.local_map.visit_tile(self.position.get_position())
         if self.params.random_coverage and np.random.random() < 0.5:
-            for i in range(0, random.randint(0, ceil(self.params.size ** 2 / 2))):
-                tile = (random.randint(0, self.params.size-1), random.randint(0, self.params.size-1))
+            for i in range(0, random.randint(0, ceil(self.params.real_size ** 2 / 1.5))):
+                tile = (random.randint(0, self.params.real_size-1), random.randint(0, self.params.real_size-1))
                 if tile not in self.local_map.visited_list and tile in set(self.global_map.getTiles()).difference(self.global_map.obstacle_list):
                     self.local_map.visit_tile(tile)
 
@@ -185,6 +185,7 @@ class State:
         self.t_to_go = self.params.size ** 2 * 2
         self.terminated = False
         self.truncated = False
+        self.timesteps = 0
         s = self.local_map.center_map(self.position.get_position())
         self.state_array = [s]
         if self.remaining < 1:

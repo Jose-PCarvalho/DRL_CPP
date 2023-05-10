@@ -11,6 +11,7 @@ from src.Environment.Environment import *
 # Test DQN
 def test(args, T, dqn, val_mem, metrics, results_dir, env_args, evaluate=False):
     env_args['random_coverage'] = False
+    env_args['random_size'] = False
     env = Environment(EnvironmentParams(env_args))
     metrics['steps'].append(T)
     T_rewards, T_Qs, T_overlap = [], [], []
