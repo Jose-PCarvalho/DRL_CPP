@@ -68,7 +68,7 @@ parser.add_argument('--atoms', type=int, default=51, metavar='C', help='Discreti
 parser.add_argument('--V-min', type=float, default=-625, metavar='V', help='Minimum of value distribution support')
 parser.add_argument('--V-max', type=float, default=625, metavar='V', help='Maximum of value distribution support')
 parser.add_argument('--model', type=str, metavar='PARAMS', help='Pretrained model (state dict)')
-parser.add_argument('--memory-capacity', type=int, default=int(250000), metavar='CAPACITY',
+parser.add_argument('--memory-capacity', type=int, default=int(1e6), metavar='CAPACITY',
                     help='Experience replay memory capacity')
 parser.add_argument('--replay-frequency', type=int, default=4, metavar='k', help='Frequency of sampling from memory')
 parser.add_argument('--priority-exponent', type=float, default=0.5, metavar='ω',
@@ -84,7 +84,7 @@ parser.add_argument('--learning-rate', type=float, default=0.0001, metavar='η',
 parser.add_argument('--adam-eps', type=float, default=1.5e-4, metavar='ε', help='Adam epsilon')
 parser.add_argument('--batch-size', type=int, default=32, metavar='SIZE', help='Batch size')
 parser.add_argument('--norm-clip', type=float, default=10, metavar='NORM', help='Max L2 norm for gradient clipping')
-parser.add_argument('--learn-start', type=int, default=int(50e3), metavar='STEPS',
+parser.add_argument('--learn-start', type=int, default=int(2e3), metavar='STEPS',
                     help='Number of steps before starting training')
 parser.add_argument('--evaluate', action='store_true', help='Evaluate only')
 parser.add_argument('--evaluation-interval', type=int, default=25000, metavar='STEPS',
