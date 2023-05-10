@@ -92,7 +92,7 @@ parser.add_argument('--evaluation-interval', type=int, default=25000, metavar='S
 parser.add_argument('--evaluation-episodes', type=int, default=5, metavar='N',
                     help='Number of evaluation episodes to average over')
 # TODO: Note that DeepMind's evaluation method is running the latest agent for 500K frames ever every 1M steps
-parser.add_argument('--evaluation-size', type=int, default=500, metavar='N',
+parser.add_argument('--evaluation-size', type=int, default=2000, metavar='N',
                     help='Number of transitions to use for validating Q')
 parser.add_argument('--render', action='store_true', help='Display screen (testing only)')
 parser.add_argument('--enable-cudnn', action='store_true', help='Enable cuDNN (faster but nondeterministic)')
@@ -167,7 +167,7 @@ while e < number_envs + 1:
         priority_weight_increase = (1 - args.priority_weight) / (args.T_max - args.learn_start)
         retries = 0
         args.T_max = conf['env' + str(e)]['base_steps']
-        mem = ReplayMemory(args, args.memory_capacity)
+        #mem = ReplayMemory(args, args.memory_capacity)
     env_str = 'env' + str(e)
     env = Environment(EnvironmentParams(conf[env_str]))
     print(conf[env_str])
@@ -183,7 +183,8 @@ while e < number_envs + 1:
         if done or truncated:
             state, info = env.reset()
 
-        next_state, _, done, truncated, info = env.step(np.random.randint(0, action_space))
+        action = env.get_heuristic_action().value
+        next_state, _, done, truncated, info = env.step(action)
         val_mem.append(state[0], state[1], -1, 0.0, done, truncated)
         state = next_state
         T += 1
