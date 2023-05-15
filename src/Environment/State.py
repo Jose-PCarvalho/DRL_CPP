@@ -169,8 +169,7 @@ class State:
         elif self.params.sensor == "camera":
             self.local_map.camera(self.position.get_position(), self.global_map, self.params.sensor_range)
 
-        self.remaining = len(set(self.global_map.getTiles()).difference(
-            self.global_map.obstacle_list)) - len(self.local_map.visited_list)  # height * width - 1 - obstacle_number
+        self.remaining = len(set(self.global_map.getTiles()).difference(self.global_map.obstacle_list)) - len(self.local_map.visited_list)
         if self.remaining < 1:
             self.init_episode()
         self.optimal_steps = self.remaining

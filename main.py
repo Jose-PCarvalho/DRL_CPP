@@ -51,6 +51,19 @@ def use_pseudo(ovrl):
         return False
 
 
+def best_learning_rate(ovrl,trunc, base_lr):
+    if ovrl < 0.15:
+        return base_lr * 2
+    elif 0.15 <= ovrl < 0.4:
+        return base_lr * 1.5
+    elif 0.4 <= ovrl < 0.8:
+        return base_lr
+    elif not trunc:
+        return base_lr
+    else:
+        return base_lr*0.5
+
+
 # Note that hyperparameters may originally be reported in ATARI game frames instead of agent steps
 parser = argparse.ArgumentParser(description='Rainbow')
 parser.add_argument('--seed', type=int, default=123, help='Random seed')
@@ -167,7 +180,7 @@ while e < number_envs + 1:
         priority_weight_increase = (1 - args.priority_weight) / (args.T_max - args.learn_start)
         retries = 0
         args.T_max = conf['env' + str(e)]['base_steps']
-        #mem = ReplayMemory(args, args.memory_capacity)
+        # mem = ReplayMemory(args, args.memory_capacity)
     env_str = 'env' + str(e)
     env = Environment(EnvironmentParams(conf[env_str]))
     print(conf[env_str])
@@ -185,7 +198,7 @@ while e < number_envs + 1:
 
         action = env.get_heuristic_action().value
         next_state, _, done, truncated, info = env.step(action)
-        val_mem.append(state[0], state[1], -1, 0.0, done, truncated)
+        val_mem.append(state[0], state[1], -1, 0.0, done, truncated,0)
         state = next_state
         T += 1
 
@@ -201,9 +214,17 @@ while e < number_envs + 1:
         done = True
         truncated = False
         last_truncated = False
+        episode_transitions = []
         for T in trange(1, args.T_max + 1):
 
             if done or truncated:
+                if len(episode_transitions) > 0:
+                    overlap = env.rewards.get_overlap()
+                    lr=best_learning_rate(overlap,truncated,args.learning_rate)
+                    for t in episode_transitions:
+                        mem.append(t[0], t[1], t[2], t[3], t[4], t[5],lr)
+
+                episode_transitions.clear()
                 last_truncated = truncated
                 state, _ = env.reset()
                 pseudo_episode = False
@@ -227,8 +248,8 @@ while e < number_envs + 1:
 
             next_state, reward, done, truncated, info = env.step(action)  # Step
 
-            mem.append(state[0], state[1], action, reward, done, truncated)  # Append transition to memory
-
+            #mem.append(state[0], state[1], action, reward, done, truncated)  # Append transition to memory
+            episode_transitions.append((state[0], state[1], action, reward, done, truncated))
             # Train and test
             if T >= args.learn_start:
 
@@ -259,6 +280,7 @@ while e < number_envs + 1:
                     dqn.save(results_dir, 'checkpoint.pth')
 
             state = next_state
+
         e += 1
         dqn.save(results_dir, conf[env_str]['name'] + '.pth')
 
