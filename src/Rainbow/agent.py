@@ -105,11 +105,8 @@ class Agent:
 
         loss = -torch.sum(m * log_ps_a, 1)  # Cross-entropy loss (minimises DKL(m||p(s_t, a_t)))
         self.online_net.zero_grad()
-        (weights * loss).mean().backward()  # Backpropagate importance-weighted minibatch loss
+        (weights * loss * lr[:, 0]).mean().backward()  # Backpropagate importance-weighted minibatch loss
         clip_grad_norm_(self.online_net.parameters(), self.norm_clip)  # Clip gradients by L2 norm
-        lr = lr[:, 0].mean()
-        for param_group in self.optimiser.param_groups:
-            param_group['lr'] = lr.detach().cpu().numpy()
         self.optimiser.step()
 
         mem.update_priorities(idxs, loss.detach().cpu().numpy())  # Update priorities of sampled transitions

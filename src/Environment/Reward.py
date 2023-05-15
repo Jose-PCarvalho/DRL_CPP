@@ -41,7 +41,7 @@ class GridRewards:
         self.total_steps = state.remaining
         self.remaining = state.remaining
         self.last_remaining_potential = -self.remaining  # / self.total_steps
-        closest_cell = state.local_map.min_manhattan_distance(state.position.get_position())[0]
+        closest_cell = state.local_map.min_manhattan_distance(state.position.get_position())[1]
         self.closest = -len(
             state.local_map.dijkstra_search(state.position.get_position(), (closest_cell[0], closest_cell[1])))
 
@@ -50,15 +50,16 @@ class GridRewards:
         self.steps += 1
         self.remaining = state.remaining
         new_remaining_potential = - self.remaining  # / self.total_steps
-        new_closest_cell = state.local_map.min_manhattan_distance(state.position.get_position())[0]
-        new_closest = -len(
-            state.local_map.dijkstra_search(state.position.get_position(), (new_closest_cell[0], new_closest_cell[1])))
+
         if Events.NEW in events:
             r += self.params.new_tile_reward
         else:
             # r += self.params.repeated_field_reward
+            new_closest_cell = state.local_map.min_manhattan_distance(state.position.get_position())[1]
+            new_closest = -len(state.local_map.dijkstra_search(state.position.get_position(),(new_closest_cell[0], new_closest_cell[1])))
             r += 0.25 * (new_closest - self.closest)
             self.overlap += 1
+            self.closest = new_closest
         if Events.BLOCKED in events:
             r += self.params.blocked_reward
         if Events.FINISHED in events:
@@ -68,7 +69,6 @@ class GridRewards:
         r += self.params.repeated_field_reward
         r += (new_remaining_potential - self.last_remaining_potential) * 1.5
         self.last_remaining_potential = new_remaining_potential
-        self.closest = new_closest
         self.cumulative_reward += r
 
         return r
