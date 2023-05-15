@@ -58,10 +58,10 @@ def best_learning_rate(ovrl,trunc, base_lr):
         return base_lr * 1.5
     elif 0.4 <= ovrl < 0.8:
         return base_lr
-    elif not trunc:
-        return base_lr
+    # elif not trunc:
+    #     return base_lr
     else:
-        return base_lr*0.5
+        return base_lr*0.8
 
 
 # Note that hyperparameters may originally be reported in ATARI game frames instead of agent steps
@@ -227,6 +227,7 @@ while e < number_envs + 1:
                 episode_transitions.clear()
                 last_truncated = truncated
                 state, _ = env.reset()
+                dqn.update_C51(env.state.params.real_size)
                 pseudo_episode = False
                 if use_pseudo_agent and avg_overlap > 0.5:
                     pseudo_episode = use_pseudo(avg_overlap)
