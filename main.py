@@ -53,15 +53,15 @@ def use_pseudo(ovrl):
 
 def best_learning_rate(ovrl,trunc, base_lr):
     if ovrl < 0.15:
-        return 2
-    elif 0.15 <= ovrl < 0.4:
         return 1.5
+    elif 0.15 <= ovrl < 0.4:
+        return 1.25
     elif 0.4 <= ovrl < 0.8:
         return 1
     # elif not trunc:
     #     return base_lr
     else:
-        return 0.8
+        return 0.625
 
 
 # Note that hyperparameters may originally be reported in ATARI game frames instead of agent steps
