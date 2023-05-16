@@ -19,9 +19,10 @@ while True:
     env.render()
     for t in itertools.count():
         observation_, reward, done, truncated, info = env.step(env.get_heuristic_action())
-        # print(action)
+        print(reward)
         # print(env.state.remaining)
         env.render()
+        #time.sleep(5)
 
         observation = observation_
         if done or truncated:
