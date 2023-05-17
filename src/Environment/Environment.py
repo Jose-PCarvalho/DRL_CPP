@@ -20,6 +20,8 @@ class Environment:
         self.episode_count = 0
         self.viz = Vizualization()
         self.params = params.state_params
+        self.stall_counter = 0
+        self.remaining = 0  ## Only for stalling purposes, the actual variable is in the state.
 
     def reset(self):
         if self.state.truncated:
@@ -27,6 +29,7 @@ class Environment:
         else:
             self.state.init_episode()
         self.rewards.reset(self.state)
+        self.remaining=self.state.remaining
         return self.get_observation(), self.get_info()
 
     def step(self, action):
@@ -45,16 +48,26 @@ class Environment:
         return (np.array(self.state.state_array), self.state.t_to_go)
 
     def get_info(self):
-        return {}
+        if self.remaining == self.state.remaining:
+            self.stall_counter += 1
+        else:
+            self.stall_counter = 0
+
+        self.remaining = self.state.remaining
+        if self.stall_counter > 15:
+            return True
+        else:
+            return False
+
 
     def get_heuristic_action(self):
         closest = self.state.local_map.min_manhattan_distance(self.state.position.get_position())[1]
-        path = self.state.local_map.dijkstra_search(self.state.position.get_position(), (closest[0],closest[1]))
-        if len(path)==0:
+        path = self.state.local_map.dijkstra_search(self.state.position.get_position(), (closest[0], closest[1]))
+        if len(path) == 0:
             print('wtf')
         next = path[0]
         diff = np.array(next) - np.array(self.state.position.get_position())
-        diff = (diff[0],diff[1])
+        diff = (diff[0], diff[1])
         if diff == (1, 0):
             return Actions.SOUTH
         elif diff == (-1, 0):
@@ -63,4 +76,3 @@ class Environment:
             return Actions.EAST
         if diff == (0, -1):
             return Actions.WEST
-

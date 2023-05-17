@@ -226,7 +226,7 @@ while e < number_envs + 1:
 
                 episode_transitions.clear()
                 last_truncated = truncated
-                state, _ = env.reset()
+                state, info = env.reset()
                 pseudo_episode = False
                 if use_pseudo_agent and avg_overlap > 0.5:
                     pseudo_episode = use_pseudo(avg_overlap)
@@ -239,7 +239,7 @@ while e < number_envs + 1:
                 dqn.reset_noise()  # Draw a new set of noisy weights
 
             if not pseudo_episode:
-                if last_truncated and np.random.random() < 0.9:
+                if (last_truncated or info) and np.random.random() < 0.9:
                     action = env.get_heuristic_action().value
                 else:
                     action = dqn.act(state[0], state[1])
