@@ -38,8 +38,8 @@ def test(args, T, dqn, val_mem, metrics, results_dir, env_args, evaluate=False):
     # env.close()
 
     # Test Q-values over validation memory
-    for state, battery in val_mem:  # Iterate over valid states
-        T_Qs.append(dqn.evaluate_q(state, battery))
+    for state, battery, last_action in val_mem:  # Iterate over valid states
+        T_Qs.append(dqn.evaluate_q(state, battery,last_action))
 
     avg_reward, avg_Q, avg_overlap = sum(T_rewards) / len(T_rewards), sum(T_Qs) / len(T_Qs), sum(T_overlap) / len(
         T_overlap)

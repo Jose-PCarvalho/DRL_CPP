@@ -66,8 +66,7 @@ class Agent:
     # Acts with an ε-greedy policy (used for evaluation only)
     def act_e_greedy(self, state, battery, last_action,
                      epsilon=0.00001):  # High ε can reduce evaluation scores drastically
-        return np.random.randint(0, self.action_space) if np.random.random() < epsilon else self.act(state, battery,
-        F.one_hot(torch.tensor(last_action,dtype=torch.int64,device=self.device),5))
+        return np.random.randint(0, self.action_space) if np.random.random() < epsilon else self.act(state, battery,last_action)
 
     def learn(self, mem):
         # Sample transitions
@@ -128,8 +127,7 @@ class Agent:
     # Evaluates Q-value based on single state (no batch)
     def evaluate_q(self, state, battery, last_action):
         with torch.no_grad():
-            last_action = torch.nn.functional.one_hot(torch.tensor(last_action, dtype=torch.int32, device=self.device),
-                                                      5)
+            last_action = F.one_hot(last_action,5)
             return \
                 (self.online_net(state.unsqueeze(0), battery.unsqueeze(0),
                                  last_action.unsqueeze(0)) * self.support).sum(

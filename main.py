@@ -134,7 +134,7 @@ if torch.cuda.is_available() and not args.disable_cuda:
     print("Initiating cuda")
     args.device = torch.device('cuda')
     torch.cuda.manual_seed(np.random.randint(1, 10000))
-    torch.backends.cudnn.enabled = args.enable_cudnn
+    torch.backends.cudnn.enabled = True
 else:
     args.device = torch.device('cpu')
     print("Initiating CPU")
