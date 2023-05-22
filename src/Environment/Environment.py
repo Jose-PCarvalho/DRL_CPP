@@ -45,7 +45,7 @@ class Environment:
         # self.viz.render_center(self.state.local_map.center_map(self.stateposition.get_position()).transpose(2, 0, 1))
 
     def get_observation(self):
-        return (np.array(self.state.state_array), self.state.t_to_go)
+        return (np.array(self.state.state_array), self.state.t_to_go,self.state.last_action.value)
 
     def get_info(self):
         if self.remaining == self.state.remaining:

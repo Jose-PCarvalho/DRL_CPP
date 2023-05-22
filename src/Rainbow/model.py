@@ -66,10 +66,11 @@ class DQN(nn.Module):
         elif args.architecture == 'data-efficient':
             self.convs = nn.Sequential(nn.Conv2d(3, 16, 3, stride=1, padding='same'), nn.ReLU(),
                                        nn.Conv2d(16, 32, 3, stride=2), nn.ReLU(),  # stride 1
-                                       nn.Conv2d(32, 64, 3, stride=2),nn.ReLU())  # kernel size 3 , stride 2, stable version had kernel 4
+                                       nn.Conv2d(32, 64, 3, stride=2),
+                                       nn.ReLU())  # kernel size 3 , stride 2, stable version had kernel 4
             self.conv_output_size = self._get_conv_out([3, 37, 37])
-        self.fc_h_v = NoisyLinear(self.conv_output_size + 1, args.hidden_size, std_init=args.noisy_std)
-        self.fc_h_a = NoisyLinear(self.conv_output_size + 1, args.hidden_size, std_init=args.noisy_std)
+        self.fc_h_v = NoisyLinear(self.conv_output_size + 6, args.hidden_size, std_init=args.noisy_std)
+        self.fc_h_a = NoisyLinear(self.conv_output_size + 6, args.hidden_size, std_init=args.noisy_std)
         self.fc_z_v = NoisyLinear(args.hidden_size, self.atoms, std_init=args.noisy_std)
         self.fc_z_a = NoisyLinear(args.hidden_size, action_space * self.atoms, std_init=args.noisy_std)
 
@@ -77,12 +78,14 @@ class DQN(nn.Module):
         o = self.convs(torch.zeros(1, *shape))
         return int(np.prod(o.size()))
 
-    def forward(self, x, b, log=False):
+    def forward(self, x, b, a, log=False):
         b = b.view(-1, 1)
+        a = a.view(a.size(0), -1)
         x = x.reshape(x.size(0), -1, x.size(-2), x.size(-1))
         x = self.convs(x)
         x = x.view(x.size(0), -1)
         x = torch.cat((x, b), 1)
+        x = torch.cat((x, a), 1)
         v = self.fc_z_v(F.relu(self.fc_h_v(x)))  # Value stream
         a = self.fc_z_a(F.relu(self.fc_h_a(x)))  # Advantage stream
         v, a = v.view(-1, 1, self.atoms), a.view(-1, self.action_space, self.atoms)

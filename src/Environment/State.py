@@ -46,7 +46,7 @@ class State:
         self.global_map = None
         self.position = None
         self.remaining = None
-        self.last_action = None
+        self.last_action = 0
         self.timesteps = None
         self.t_to_go = None
         self.optimal_steps = None
@@ -179,6 +179,7 @@ class State:
         self.truncated = False
         s = self.local_map.center_map(self.position.get_position())
         self.state_array = [s]
+        self.last_action = Actions.NORTH
 
     def partial_reset(self):
         self.t_to_go = self.params.size ** 2 * 2

@@ -51,7 +51,8 @@ def use_pseudo(ovrl):
         return False
 
 
-def best_learning_rate(ovrl,trunc, base_lr):
+def best_learning_rate(ovrl, trunc, base_lr):
+    return 1
     if ovrl < 0.15:
         return 1.5
     elif 0.15 <= ovrl < 0.4:
@@ -94,7 +95,7 @@ parser.add_argument('--target-update', type=int, default=int(8e3), metavar='τ',
                     help='Number of steps after which to update target network')
 parser.add_argument('--reward-clip', type=int, default=1, metavar='VALUE', help='Reward clipping (0 to disable)')
 parser.add_argument('--learning-rate', type=float, default=0.0001, metavar='η', help='Learning rate')
-parser.add_argument('--adam-eps', type=float, default=1.5e-4, metavar='ε', help='Adam epsilon')
+parser.add_argument('--adam-eps', type=float, default=4e-5, metavar='ε', help='Adam epsilon')
 parser.add_argument('--batch-size', type=int, default=32, metavar='SIZE', help='Batch size')
 parser.add_argument('--norm-clip', type=float, default=10, metavar='NORM', help='Max L2 norm for gradient clipping')
 parser.add_argument('--learn-start', type=int, default=int(2e3), metavar='STEPS',
@@ -168,16 +169,17 @@ retries = 0
 all_T = 0
 T = 0
 e = args.starting_environment
+priority_weight_increase = (args.priority_weight) / (14.5e6)
 while e < number_envs + 1:
 
     if e > 1 and avg_overlap > 0.2:
         e -= 1
-        args.priority_weight = (1 - starting_priority_weight) / (retries + 1) + starting_priority_weight
+        # args.priority_weight = (1 - starting_priority_weight) / (retries + 1) + starting_priority_weight
         retries += 1
     else:
         print(avg_overlap)
-        args.priority_weight = starting_priority_weight
-        priority_weight_increase = (1 - args.priority_weight) / (args.T_max - args.learn_start)
+        # args.priority_weight = starting_priority_weight
+        # priority_weight_increase = (1 - args.priority_weight) / (args.T_max - args.learn_start)
         retries = 0
         args.T_max = conf['env' + str(e)]['base_steps']
         # mem = ReplayMemory(args, args.memory_capacity)
@@ -198,7 +200,7 @@ while e < number_envs + 1:
 
         action = env.get_heuristic_action().value
         next_state, _, done, truncated, info = env.step(action)
-        val_mem.append(state[0], state[1], -1, 0.0, done, truncated,0)
+        val_mem.append(state[0], state[1], state[2], -1, 0.0, done, truncated, 0)
         state = next_state
         T += 1
 
@@ -220,9 +222,9 @@ while e < number_envs + 1:
             if done or truncated:
                 if len(episode_transitions) > 0:
                     overlap = env.rewards.get_overlap()
-                    lr=best_learning_rate(overlap,truncated,args.learning_rate)
+                    lr = best_learning_rate(overlap, truncated, args.learning_rate)
                     for t in episode_transitions:
-                        mem.append(t[0], t[1], t[2], t[3], t[4], t[5],lr)
+                        mem.append(t[0], t[1], t[2], t[3], t[4], t[5], t[6], lr)
 
                 episode_transitions.clear()
                 last_truncated = truncated
@@ -242,14 +244,15 @@ while e < number_envs + 1:
                 if (last_truncated or info) and np.random.random() < 0.9:
                     action = env.get_heuristic_action().value
                 else:
-                    action = dqn.act(state[0], state[1])
+                    action = dqn.act(state[0], state[1],
+                                     state[2])
             else:
                 action = pseudo_agent.select_action(state[0][-1]).value
 
             next_state, reward, done, truncated, info = env.step(action)  # Step
 
-            #mem.append(state[0], state[1], action, reward, done, truncated)  # Append transition to memory
-            episode_transitions.append((state[0], state[1], action, reward, done, truncated))
+            # mem.append(state[0], state[1], action, reward, done, truncated)  # Append transition to memory
+            episode_transitions.append((state[0], state[1], state[2], action, reward, done, truncated))
             # Train and test
             if T >= args.learn_start:
 
@@ -283,5 +286,6 @@ while e < number_envs + 1:
 
         e += 1
         dqn.save(results_dir, conf[env_str]['name'] + '.pth')
+        dqn.optimiser.param_groups[0]["lr"] /= 2
 
     # env.close()

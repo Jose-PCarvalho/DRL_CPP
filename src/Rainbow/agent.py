@@ -4,6 +4,7 @@ import numpy as np
 import torch
 from torch import optim
 from torch.nn.utils import clip_grad_norm_
+import torch.nn.functional as F
 
 from src.Rainbow.model import DQN
 
@@ -53,34 +54,42 @@ class Agent:
         self.online_net.reset_noise()
 
     # Acts based on single state (no batch)
-    def act(self, state, battery):
+    def act(self, state, battery, last_action):
         with torch.no_grad():
             # state = torch.tensor(state[-1], dtype=torch.float32, device='cuda')
             state = torch.tensor(state, dtype=torch.float32, device=self.device)
             battery = torch.tensor(battery, dtype=torch.int32, device=self.device)
-            return (self.online_net(state.unsqueeze(0), battery.unsqueeze(0)) * self.support).sum(2).argmax(1).item()
+            last_action = F.one_hot(torch.tensor(last_action, dtype=torch.int64, device=self.device), 5)
+            return (self.online_net(state.unsqueeze(0), battery.unsqueeze(0),
+                                    last_action.unsqueeze(0)) * self.support).sum(2).argmax(1).item()
 
     # Acts with an ε-greedy policy (used for evaluation only)
-    def act_e_greedy(self, state, battery, epsilon=0.00001):  # High ε can reduce evaluation scores drastically
-        return np.random.randint(0, self.action_space) if np.random.random() < epsilon else self.act(state, battery)
+    def act_e_greedy(self, state, battery, last_action,
+                     epsilon=0.00001):  # High ε can reduce evaluation scores drastically
+        return np.random.randint(0, self.action_space) if np.random.random() < epsilon else self.act(state, battery,
+                                                                                                     torch.nn.functional.one_hot(
+                                                                                                         last_action,
+                                                                                                         5))
 
     def learn(self, mem):
         # Sample transitions
-        idxs, states, actions, returns, next_states, nonterminals, weights, battery, next_battery, lr = mem.sample(
-            self.batch_size)
+        idxs, states, actions, returns, next_states, nonterminals, weights, battery, next_battery, lr, last_action, \
+        next_last_action = mem.sample(self.batch_size)
 
         # Calculate current state probabilities (online network noise already sampled)
-        log_ps = self.online_net(states, battery, log=True)  # Log probabilities log p(s_t, ·; θonline)
+        log_ps = self.online_net(states, battery, F.one_hot(last_action, 5),
+                                 log=True)  # Log probabilities log p(s_t, ·; θonline)
         log_ps_a = log_ps[range(self.batch_size), actions]  # log p(s_t, a_t; θonline)
 
         with torch.no_grad():
             # Calculate nth next state probabilities
-            pns = self.online_net(next_states, next_battery)  # Probabilities p(s_t+n, ·; θonline)
+            pns = self.online_net(next_states, next_battery,
+                                  F.one_hot(next_last_action, 5))  # Probabilities p(s_t+n, ·; θonline)
             dns = self.support.expand_as(pns) * pns  # Distribution d_t+n = (z, p(s_t+n, ·; θonline))
             argmax_indices_ns = dns.sum(2).argmax(
                 1)  # Perform argmax action selection using online network: argmax_a[(z, p(s_t+n, a; θonline))]
             self.target_net.reset_noise()  # Sample new target net noise
-            pns = self.target_net(next_states, next_battery)  # Probabilities p(s_t+n, ·; θtarget)
+            pns = self.target_net(next_states, next_battery, F.one_hot(next_last_action,5))  # Probabilities p(s_t+n, ·; θtarget)
             pns_a = pns[range(
                 self.batch_size), argmax_indices_ns]  # Double-Q probabilities p(s_t+n, argmax_a[(z, p(s_t+n, a; θonline))]; θtarget)
 
@@ -119,9 +128,14 @@ class Agent:
         torch.save(self.online_net.state_dict(), os.path.join(path, name))
 
     # Evaluates Q-value based on single state (no batch)
-    def evaluate_q(self, state, battery):
+    def evaluate_q(self, state, battery, last_action):
         with torch.no_grad():
-            return (self.online_net(state.unsqueeze(0), battery.unsqueeze(0)) * self.support).sum(2).max(1)[0].item()
+            last_action = torch.nn.functional.one_hot(torch.tensor(last_action, dtype=torch.int32, device=self.device),
+                                                      5)
+            return \
+                (self.online_net(state.unsqueeze(0), battery.unsqueeze(0),
+                                 last_action.unsqueeze(0)) * self.support).sum(
+                    2).max(1)[0].item()
 
     def train(self):
         self.online_net.train()
