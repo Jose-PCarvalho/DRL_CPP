@@ -24,7 +24,7 @@ def test(args, T, dqn, val_mem, metrics, results_dir, env_args, evaluate=False):
                 state, info = env.reset()
                 reward_sum, done, truncated = 0, False, False
 
-            action = dqn.act_e_greedy(state[0], state[1])  # Choose an action ε-greedily
+            action = dqn.act_e_greedy(state[0], state[1],state[2])  # Choose an action ε-greedily
             state, reward, done, truncated, info = env.step(action)  # Step
 
             reward_sum += reward
