@@ -67,9 +67,7 @@ class Agent:
     def act_e_greedy(self, state, battery, last_action,
                      epsilon=0.00001):  # High ε can reduce evaluation scores drastically
         return np.random.randint(0, self.action_space) if np.random.random() < epsilon else self.act(state, battery,
-                                                                                                     torch.nn.functional.one_hot(
-                                                                                                         last_action,
-                                                                                                         5))
+        F.one_hot(torch.tensor(last_action,dtype=torch.int64,device=self.device),5))
 
     def learn(self, mem):
         # Sample transitions
