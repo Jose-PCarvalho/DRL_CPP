@@ -259,7 +259,7 @@ while e < number_envs + 1:
 
                 mem.priority_weight = min(mem.priority_weight + priority_weight_increase, 1)
 
-                if T % 1 ==0: #args.replay_frequency == 0:
+                if T % args.replay_frequency == 0:
                     dqn.learn(mem)  # Train with n-step distributional double-Q learning
 
                 if T % args.evaluation_interval == 0:
@@ -276,7 +276,7 @@ while e < number_envs + 1:
                         save_memory(mem, args.memory, args.disable_bzip_memory)
 
                 # Update target network
-                if T % args.target_update == 0:
+                if T % 1 == 0:
                     dqn.update_target_net()
 
                 # Checkpoint the network
