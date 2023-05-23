@@ -21,6 +21,7 @@ class Agent:
         self.n = args.multi_step
         self.discount = args.discount
         self.norm_clip = args.norm_clip
+        self.tau = args.tau
         self.device = args.device
 
         self.online_net = DQN(args, self.action_space).to(device=args.device)
@@ -118,7 +119,13 @@ class Agent:
         mem.update_priorities(idxs, loss.detach().cpu().numpy())  # Update priorities of sampled transitions
 
     def update_target_net(self):
-        self.target_net.load_state_dict(self.online_net.state_dict())
+        #self.target_net.load_state_dict(self.online_net.state_dict())
+        self.eval()
+        with torch.no_grad():
+            for target_param, local_param in zip(self.target_net.parameters(), self.online_net.parameters()):
+                target_param.data.copy_(self.tau * local_param.data + (1.0 - self.tau) * target_param.data)
+        self.train()
+
 
     # Save model parameters on current device (don't move model between devices)
     def save(self, path, name='model.pth'):

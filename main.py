@@ -118,6 +118,7 @@ parser.add_argument('--disable-bzip-memory', action='store_true',
 parser.add_argument('--config-file', type=str, default='configs/training_obstacles.yaml')
 parser.add_argument('--log-file', type=str, default='results/log.txt')
 parser.add_argument('--starting-environment', type=int, default=1)
+parser.add_argument('--tau', type=float, default=0.001, metavar='NORM', help='Max L2 norm for gradient clipping')
 
 # Setup
 args = parser.parse_args()
@@ -258,7 +259,7 @@ while e < number_envs + 1:
 
                 mem.priority_weight = min(mem.priority_weight + priority_weight_increase, 1)
 
-                if T % args.replay_frequency == 0:
+                if T % 1 ==0: #args.replay_frequency == 0:
                     dqn.learn(mem)  # Train with n-step distributional double-Q learning
 
                 if T % args.evaluation_interval == 0:
