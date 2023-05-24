@@ -118,7 +118,7 @@ parser.add_argument('--disable-bzip-memory', action='store_true',
 parser.add_argument('--config-file', type=str, default='configs/training_obstacles.yaml')
 parser.add_argument('--log-file', type=str, default='results/log.txt')
 parser.add_argument('--starting-environment', type=int, default=1)
-parser.add_argument('--tau', type=float, default=0.001, metavar='NORM', help='Max L2 norm for gradient clipping')
+parser.add_argument('--tau', type=float, default=0.004)
 
 # Setup
 args = parser.parse_args()
@@ -170,7 +170,7 @@ retries = 0
 all_T = 0
 T = 0
 e = args.starting_environment
-priority_weight_increase = (args.priority_weight) / (24.5e6)
+priority_weight_increase = (args.priority_weight) / (25e6)
 while e < number_envs + 1:
 
     if e > 1 and avg_overlap > 0.2:

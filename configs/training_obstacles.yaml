@@ -1,6 +1,6 @@
 env1:
   name: "env1_Full_Info_Non_Rand_Size5_Rand_Starting_Pose_Obstacle"
-  base_steps: 2000000
+  base_steps: 1000000
   sensor: "full information"
   sensor_range: 2
   size: 5
@@ -15,7 +15,7 @@ env1:
   random_coverage : true
 env2:
   name: "env2_Full_Info_Non_Rand_Size10_Rand_Starting_Pose_Obstacle"
-  base_steps: 5000000
+  base_steps: 3500000
   sensor: "full information"
   sensor_range: 2
   size: 10
@@ -30,7 +30,7 @@ env2:
   random_coverage : true
 env3:
   name: "env3_Full_Info_Non_Rand_Size15_Rand_Starting_Pose_Obstacle"
-  base_steps: 7500000
+  base_steps: 5500000
   sensor: "full information"
   sensor_range: 2
   size: 15
@@ -45,7 +45,7 @@ env3:
   random_coverage : true
 env4:
   name: "env4_Full_Info_Non_Rand_Size19_Rand_Starting_Pose_Obstacle"
-  base_steps: 10000000
+  base_steps: 15000000
   sensor: "full information"
   sensor_range: 2
   size: 19
@@ -58,20 +58,20 @@ env4:
   starting_position_random : true
   map_config : 'empty'
   random_coverage : true
-env5:
-  name: "Final Boss"
-  base_steps: 20000000
-  sensor: "full information"
-  sensor_range: 2
-  size: 17
-  min_size: 10
-  random_size: false
-  obstacles_random: true
-  number_obstacles: 20
-  starting_position: [19,0]
-  starting_position_corner : false
-  starting_position_random : true
-  map_config : 'empty'
-  random_coverage : true
+#env5:
+#  name: "Final Boss"
+#  base_steps: 20000000
+#  sensor: "full information"
+#  sensor_range: 2
+#  size: 17
+#  min_size: 10
+#  random_size: false
+#  obstacles_random: true
+#  number_obstacles: 20
+#  starting_position: [19,0]
+#  starting_position_corner : false
+#  starting_position_random : true
+#  map_config : 'empty'
+#  random_coverage : true
 
 
