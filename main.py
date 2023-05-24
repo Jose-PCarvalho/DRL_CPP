@@ -276,7 +276,7 @@ while e < number_envs + 1:
                         save_memory(mem, args.memory, args.disable_bzip_memory)
 
                 # Update target network
-                if T % 1 == 0:
+                if T % args.replay_frequency == 0:
                     dqn.update_target_net()
 
                 # Checkpoint the network
