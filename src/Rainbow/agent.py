@@ -71,7 +71,7 @@ class Agent:
 
     def learn(self, mem):
         # Sample transitions
-        idxs, states, actions, returns, next_states, nonterminals, weights, battery, next_battery, lr, last_action, \
+        idxs, states, actions, returns, next_states, nonterminals, weights, battery, next_battery, last_action, \
         next_last_action = mem.sample(self.batch_size)
 
         # Calculate current state probabilities (online network noise already sampled)
@@ -112,7 +112,7 @@ class Agent:
 
         loss = -torch.sum(m * log_ps_a, 1)  # Cross-entropy loss (minimises DKL(m||p(s_t, a_t)))
         self.online_net.zero_grad()
-        (weights * loss * lr[:, 0]).mean().backward()  # Backpropagate importance-weighted minibatch loss
+        (weights * loss).mean().backward()  # Backpropagate importance-weighted minibatch loss
         clip_grad_norm_(self.online_net.parameters(), self.norm_clip)  # Clip gradients by L2 norm
         self.optimiser.step()
 

@@ -201,7 +201,7 @@ while e < number_envs + 1:
 
         action = env.get_heuristic_action().value
         next_state, _, done, truncated, info = env.step(action)
-        val_mem.append(state[0], state[1], state[2], -1, 0.0, done, truncated, 0)
+        val_mem.append(state[0], state[1], state[2], -1, 0.0, done, truncated)
         state = next_state
         T += 1
 
@@ -217,17 +217,10 @@ while e < number_envs + 1:
         done = True
         truncated = False
         last_truncated = False
-        episode_transitions = []
+
         for T in trange(1, args.T_max + 1):
 
             if done or truncated:
-                if len(episode_transitions) > 0:
-                    overlap = env.rewards.get_overlap()
-                    lr = best_learning_rate(overlap, truncated, args.learning_rate)
-                    for t in episode_transitions:
-                        mem.append(t[0], t[1], t[2], t[3], t[4], t[5], t[6], lr)
-
-                episode_transitions.clear()
                 last_truncated = truncated
                 state, info = env.reset()
                 pseudo_episode = False
@@ -252,8 +245,8 @@ while e < number_envs + 1:
 
             next_state, reward, done, truncated, info = env.step(action)  # Step
 
-            # mem.append(state[0], state[1], action, reward, done, truncated)  # Append transition to memory
-            episode_transitions.append((state[0], state[1], state[2], action, reward, done, truncated))
+            mem.append(state[0], state[1], state[2], action, reward, done, truncated)  # Append transition to memory
+
             # Train and test
             if T >= args.learn_start:
 
@@ -287,6 +280,6 @@ while e < number_envs + 1:
 
         e += 1
         dqn.save(results_dir, conf[env_str]['name'] + '.pth')
-        dqn.optimiser.param_groups[0]["lr"] /= 2
+        #dqn.optimiser.param_groups[0]["lr"] /= 2
 
     # env.close()
