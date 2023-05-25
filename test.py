@@ -21,7 +21,7 @@ def test(args, T, dqn, val_mem, metrics, results_dir, env_args, evaluate=False):
     for _ in range(args.evaluation_episodes):
         while True:
             if done or truncated:
-                state, info = env.reset()
+                state, info = env.reset(False)
                 reward_sum, done, truncated = 0, False, False
 
             action = dqn.act_e_greedy(state[0], state[1],state[2])  # Choose an action ε-greedily

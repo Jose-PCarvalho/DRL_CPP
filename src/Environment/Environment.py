@@ -23,8 +23,8 @@ class Environment:
         self.stall_counter = 0
         self.remaining = 0  ## Only for stalling purposes, the actual variable is in the state.
 
-    def reset(self):
-        if self.state.truncated:
+    def reset(self,partial_reset=True):
+        if self.state.truncated and partial_reset:
             self.state.partial_reset()
         else:
             self.state.init_episode()
