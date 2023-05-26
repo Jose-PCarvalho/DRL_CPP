@@ -34,8 +34,9 @@ class Environment:
             len_states = len(self.interesting_states)
             if not self.was_partial and len_states > 0 and training:
                 self.interesting_states.pop(-1)
+                len_states -= 1
             self.was_partial = False
-            if len_states > 0 and np.random.random() < 0.5 and training:
+            if len_states > 1 and np.random.random() < 0.5 and training:
                 self.state = self.interesting_states.pop(0)
             else:
                 self.state.init_episode()
