@@ -22,14 +22,28 @@ class Environment:
         self.params = params.state_params
         self.stall_counter = 0
         self.remaining = 0  ## Only for stalling purposes, the actual variable is in the state.
+        self.interesting_states = []
+        self.was_partial = False
 
-    def reset(self,partial_reset=True):
-        if self.state.truncated and partial_reset:
+    def reset(self, training=True):
+
+        if self.state.truncated and training:
             self.state.partial_reset()
+            self.was_partial = True
         else:
-            self.state.init_episode()
+            len_states = len(self.interesting_states)
+            if not self.was_partial and len_states > 0 and training:
+                self.interesting_states.pop(-1)
+            self.was_partial = False
+            if len_states > 0 and np.random.random() < 0.5 and training:
+                self.state = self.interesting_states.pop(0)
+            else:
+                self.state.init_episode()
+                if training:
+                    self.interesting_states.append(self.state)
+
         self.rewards.reset(self.state)
-        self.remaining=self.state.remaining
+        self.remaining = self.state.remaining
         return self.get_observation(), self.get_info()
 
     def step(self, action):
@@ -45,7 +59,7 @@ class Environment:
         # self.viz.render_center(self.state.local_map.center_map(self.stateposition.get_position()).transpose(2, 0, 1))
 
     def get_observation(self):
-        return (np.array(self.state.state_array), self.state.t_to_go,self.state.last_action.value)
+        return (np.array(self.state.state_array), self.state.t_to_go, self.state.last_action.value)
 
     def get_info(self):
         if self.remaining == self.state.remaining:
@@ -58,7 +72,6 @@ class Environment:
             return True
         else:
             return False
-
 
     def get_heuristic_action(self):
         closest = self.state.local_map.min_manhattan_distance(self.state.position.get_position())[1]
