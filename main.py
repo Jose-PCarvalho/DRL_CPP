@@ -170,7 +170,7 @@ retries = 0
 all_T = 0
 T = 0
 e = args.starting_environment
-priority_weight_increase = (args.priority_weight) / (25e6)
+priority_weight_increase = (args.priority_weight) / (19.5e6)
 while e < number_envs + 1:
 
     if e > 1 and avg_overlap > 0.2:
