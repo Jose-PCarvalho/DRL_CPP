@@ -170,7 +170,7 @@ retries = 0
 all_T = 0
 T = 0
 e = args.starting_environment
-priority_weight_increase = (args.priority_weight) / (19.5e6)
+priority_weight_increase = (args.priority_weight) / (5e6)
 while e < number_envs + 1:
 
     if e > 1 and avg_overlap > 0.2:
@@ -236,7 +236,7 @@ while e < number_envs + 1:
                 dqn.reset_noise()  # Draw a new set of noisy weights
 
             if not pseudo_episode:
-                if (last_truncated or info) and np.random.random() < 0.9:
+                if (info) and np.random.random() < 0.9:
                     action = env.get_heuristic_action().value
                 else:
                     action = dqn.act(state[0], state[1],

@@ -69,7 +69,7 @@ class Environment:
             self.stall_counter = 0
 
         self.remaining = self.state.remaining
-        if self.stall_counter > 15:
+        if self.stall_counter > 25:
             return True
         else:
             return False
