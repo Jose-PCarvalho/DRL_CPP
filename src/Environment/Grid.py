@@ -196,6 +196,16 @@ class GridMap:
         closest = positions[dist_idx]
         return dist, closest
 
+    def path_min_manhattan(self,agent_pos):
+        not_seen_list = set(self.getTiles()).difference(set(self.visited_list).union(set(self.obstacle_list)))
+        if len(not_seen_list) == 0:
+            return 0, [0, 0]
+        positions = np.array(list(not_seen_list))
+        distances = positions - agent_pos
+        distances = np.linalg.norm(distances, ord=1, axis=1)
+        indices = sorted(range(len(distances)), key=lambda x: distances[x])
+        return positions, indices
+
     def dijkstra_search(self, start, finish):
         frontier = PriorityQueue()
         frontier.put(start, 0)
