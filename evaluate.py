@@ -69,7 +69,7 @@ parser.add_argument('--atoms', type=int, default=51, metavar='C', help='Discreti
 parser.add_argument('--V-min', type=float, default=-625, metavar='V', help='Minimum of value distribution support')
 parser.add_argument('--V-max', type=float, default=625, metavar='V', help='Maximum of value distribution support')
 parser.add_argument('--model', type=str, metavar='PARAMS',
-                    default='model.pth',
+                    default='better_model.pth',
                     help='Pretrained model (state dict)')
 parser.add_argument('--memory-capacity', type=int, default=int(1e6), metavar='CAPACITY',
                     help='Experience replay memory capacity')
@@ -92,7 +92,7 @@ parser.add_argument('--learn-start', type=int, default=int(2e3), metavar='STEPS'
 parser.add_argument('--evaluate', action='store_true', help='Evaluate only')
 parser.add_argument('--evaluation-interval', type=int, default=25000, metavar='STEPS',
                     help='Number of training steps between evaluations')
-parser.add_argument('--evaluation-episodes', type=int, default=1000, metavar='N',
+parser.add_argument('--evaluation-episodes', type=int, default=500, metavar='N',
                     help='Number of evaluation episodes to average over')
 # TODO: Note that DeepMind's evaluation method is running the latest agent for 500K frames ever every 1M steps
 parser.add_argument('--evaluation-size', type=int, default=2000, metavar='N',
@@ -143,14 +143,12 @@ T_overlap, not_finished = [[] for _ in range(number_envs)], [0 for _ in range(nu
 for e in range(number_envs):
     env = Environment(EnvironmentParams(conf['env' + str(e + 1)]))
     action_space = env.action_space()
-    starting_priority_weight = args.priority_weight
     dqn = Agent(args, action_space)
-    dqn.update_C51(env.params.size)
     done = True
     truncated = False
+    dqn.eval()
 
     for t in range(args.evaluation_episodes):
-
         while True:
             if done or truncated:
                 state, info = env.reset(False)
