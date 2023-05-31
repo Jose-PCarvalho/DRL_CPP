@@ -26,6 +26,8 @@ class Environment:
         self.remaining = 0  ## Only for stalling purposes, the actual variable is in the state.
         self.interesting_states = []
         self.was_partial = False
+        self.heuristic_position = None
+        self.position_locked = False
 
     def reset(self, training=True):
 
@@ -47,6 +49,8 @@ class Environment:
 
         self.rewards.reset(self.state)
         self.remaining = self.state.remaining
+        self.heuristic_position = None
+        self.position_locked = False
         return self.get_observation(), self.get_info()
 
     def step(self, action):
@@ -71,18 +75,26 @@ class Environment:
             self.stall_counter = 0
 
         self.remaining = self.state.remaining
-        if self.stall_counter > 25:
+        if self.stall_counter > 15:
             return True
         else:
             return False
 
     def get_heuristic_action(self):
-        positions, indices = self.state.local_map.path_min_manhattan(self.state.position.get_position())
-        for i in indices:
-            path = self.state.local_map.dijkstra_search(self.state.position.get_position(), (positions[i][0], positions[i][1]))
-            if len(path) != 0:
-                break
+        if self.position_locked == False:
+            positions, indices = self.state.local_map.path_min_manhattan(self.state.position.get_position())
+            for i in indices:
+                path = self.state.local_map.dijkstra_search(self.state.position.get_position(),(positions[i][0], positions[i][1]))
+                if len(path) != 0:
+                    self.position_locked = True
+                    self.heuristic_position = positions[i]
+                    break
+        else:
+            path = self.state.local_map.dijkstra_search(self.state.position.get_position(),(self.heuristic_position[0], self.heuristic_position[1]))
         next = path[0]
+        if next==self.heuristic_position:
+            self.position_locked = False
+            self.heuristic_position = None
         diff = np.array(next) - np.array(self.state.position.get_position())
         diff = (diff[0], diff[1])
         if diff == (1, 0):
