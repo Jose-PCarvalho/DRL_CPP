@@ -78,6 +78,7 @@ class Environment:
         if self.stall_counter > 15:
             return True
         else:
+            self.position_locked = False
             return False
 
     def get_heuristic_action(self):
@@ -92,7 +93,7 @@ class Environment:
         else:
             path = self.state.local_map.dijkstra_search(self.state.position.get_position(),(self.heuristic_position[0], self.heuristic_position[1]))
         next = path[0]
-        if next==self.heuristic_position:
+        if np.array_equal(next,self.heuristic_position):
             self.position_locked = False
             self.heuristic_position = None
         diff = np.array(next) - np.array(self.state.position.get_position())
