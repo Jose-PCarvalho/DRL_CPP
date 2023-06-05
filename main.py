@@ -68,7 +68,7 @@ def best_learning_rate(ovrl, trunc, base_lr):
 # Note that hyperparameters may originally be reported in ATARI game frames instead of agent steps
 parser = argparse.ArgumentParser(description='Rainbow')
 parser.add_argument('--seed', type=int, default=123, help='Random seed')
-parser.add_argument('--id', type=str, default='CPP_Paper', help='Experiment ID')
+parser.add_argument('--id', type=str, default='Test', help='Experiment ID')
 parser.add_argument('--disable-cuda', action='store_true', help='Disable CUDA')
 parser.add_argument('--T-max', type=int, default=int(70e4), metavar='STEPS',
                     help='Number of training steps (4x number of frames)')
@@ -89,15 +89,15 @@ parser.add_argument('--priority-exponent', type=float, default=0.5, metavar='ω'
                     help='Prioritised experience replay exponent (originally denoted α)')
 parser.add_argument('--priority-weight', type=float, default=0.4, metavar='β',
                     help='Initial prioritised experience replay importance sampling weight')
-parser.add_argument('--multi-step', type=int, default=3, metavar='n', help='Number of steps for multi-step return')
-parser.add_argument('--discount', type=float, default=0.9999, metavar='γ', help='Discount factor')
+parser.add_argument('--multi-step', type=int, default=1, metavar='n', help='Number of steps for multi-step return')
+parser.add_argument('--discount', type=float, default=0.999, metavar='γ', help='Discount factor')
 parser.add_argument('--target-update', type=int, default=int(8e3), metavar='τ',
                     help='Number of steps after which to update target network')
 parser.add_argument('--reward-clip', type=int, default=1, metavar='VALUE', help='Reward clipping (0 to disable)')
 parser.add_argument('--learning-rate', type=float, default=0.0001, metavar='η', help='Learning rate')
 parser.add_argument('--adam-eps', type=float, default=4e-5, metavar='ε', help='Adam epsilon')
 parser.add_argument('--batch-size', type=int, default=32, metavar='SIZE', help='Batch size')
-parser.add_argument('--norm-clip', type=float, default=10, metavar='NORM', help='Max L2 norm for gradient clipping')
+parser.add_argument('--norm-clip', type=float, default=2.5, metavar='NORM', help='Max L2 norm for gradient clipping')
 parser.add_argument('--learn-start', type=int, default=int(2e3), metavar='STEPS',
                     help='Number of steps before starting training')
 parser.add_argument('--evaluate', action='store_true', help='Evaluate only')
@@ -118,7 +118,7 @@ parser.add_argument('--disable-bzip-memory', action='store_true',
 parser.add_argument('--config-file', type=str, default='configs/training_obstacles.yaml')
 parser.add_argument('--log-file', type=str, default='results/log.txt')
 parser.add_argument('--starting-environment', type=int, default=1)
-parser.add_argument('--tau', type=float, default=0.004)
+parser.add_argument('--tau', type=float, default=0.001)
 
 # Setup
 args = parser.parse_args()
@@ -170,7 +170,7 @@ retries = 0
 all_T = 0
 T = 0
 e = args.starting_environment
-priority_weight_increase = (args.priority_weight) / (15.5e6)
+priority_weight_increase = (args.priority_weight) / (10e6)
 while e < number_envs + 1:
 
     if e > 1 and avg_overlap > 0.2:

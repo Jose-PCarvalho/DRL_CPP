@@ -68,9 +68,11 @@ parser.add_argument('--noisy-std', type=float, default=0.5, metavar='σ',
 parser.add_argument('--atoms', type=int, default=51, metavar='C', help='Discretised size of value distribution')
 parser.add_argument('--V-min', type=float, default=-625, metavar='V', help='Minimum of value distribution support')
 parser.add_argument('--V-max', type=float, default=625, metavar='V', help='Maximum of value distribution support')
+
 parser.add_argument('--model', type=str, metavar='PARAMS',
-                    default='better_model.pth',
+                    default='results/Obst2/checkpoint.pth',
                     help='Pretrained model (state dict)')
+
 parser.add_argument('--memory-capacity', type=int, default=int(1e6), metavar='CAPACITY',
                     help='Experience replay memory capacity')
 parser.add_argument('--replay-frequency', type=int, default=4, metavar='k', help='Frequency of sampling from memory')
