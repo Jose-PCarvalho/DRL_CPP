@@ -188,7 +188,8 @@ while e < number_envs + 1:
     env = Environment(EnvironmentParams(conf[env_str]))
     print(conf[env_str])
     non_obstacles = conf[env_str]['number_obstacles'] == 0
-    dqn.update_C51(conf[env_str]['size'])
+    env_size = conf[env_str]['size']
+    dqn.update_C51(env_size)
     use_pseudo_agent, pseudo_episode = non_obstacles, non_obstacles
     val_mem = ReplayMemory(args, args.evaluation_size)
     all_T += T
@@ -236,7 +237,7 @@ while e < number_envs + 1:
                 dqn.reset_noise()  # Draw a new set of noisy weights
 
             if not pseudo_episode:
-                if (info) and np.random.random() < 0.9:
+                if ((last_truncated and env_size <= 10) or info) and np.random.random() < 0.9:
                     action = env.get_heuristic_action().value
                 else:
                     action = dqn.act(state[0], state[1],
@@ -281,6 +282,6 @@ while e < number_envs + 1:
 
         e += 1
         dqn.save(results_dir, conf[env_str]['name'] + '.pth')
-        #dqn.optimiser.param_groups[0]["lr"] /= 2
+        # dqn.optimiser.param_groups[0]["lr"] /= 2
 
     # env.close()
