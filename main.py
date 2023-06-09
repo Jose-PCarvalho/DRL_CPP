@@ -96,7 +96,7 @@ parser.add_argument('--target-update', type=int, default=int(8e3), metavar='τ',
 parser.add_argument('--reward-clip', type=int, default=1, metavar='VALUE', help='Reward clipping (0 to disable)')
 parser.add_argument('--learning-rate', type=float, default=0.0001, metavar='η', help='Learning rate')
 parser.add_argument('--adam-eps', type=float, default=4e-5, metavar='ε', help='Adam epsilon')
-parser.add_argument('--batch-size', type=int, default=32, metavar='SIZE', help='Batch size')
+parser.add_argument('--batch-size', type=int, default=128, metavar='SIZE', help='Batch size')
 parser.add_argument('--norm-clip', type=float, default=2.5, metavar='NORM', help='Max L2 norm for gradient clipping')
 parser.add_argument('--learn-start', type=int, default=int(2e3), metavar='STEPS',
                     help='Number of steps before starting training')

@@ -12,6 +12,7 @@ env1:
   starting_position_corner : false
   starting_position_random : false
   map_config : 'maps/Map1.yaml'
+  random_coverage : false
 
 env2:
   name: "Map2"
@@ -27,6 +28,7 @@ env2:
   starting_position_corner : false
   starting_position_random : false
   map_config : 'maps/Map2.yaml'
+  random_coverage : false
 
 
 env3:
@@ -43,6 +45,7 @@ env3:
   starting_position_corner : false
   starting_position_random : false
   map_config : 'maps/Map3.yaml'
+  random_coverage : false
 
 env4:
   name: "Map4"
@@ -58,6 +61,7 @@ env4:
   starting_position_corner : false
   starting_position_random : false
   map_config : 'maps/Map4.yaml'
+  random_coverage : false
 
 
 env5:
@@ -74,11 +78,12 @@ env5:
   starting_position_corner : false
   starting_position_random : false
   map_config : 'maps/Map5.yaml'
+  random_coverage : false
 
 env6:
   name: "Map6"
   base_steps: 1000000
-  sensor: "full information"
+  sensor: "camera"
   sensor_range: 2
   size: 19
   min_size: 0
@@ -89,5 +94,6 @@ env6:
   starting_position_corner : false
   starting_position_random : false
   map_config : 'maps/Map6.yaml'
+  random_coverage : false
 
 

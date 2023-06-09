@@ -71,8 +71,8 @@ class DQN(nn.Module):
             self.conv_output_size = self._get_conv_out([3, 37, 37])
         self.fc_h_v = NoisyLinear(self.conv_output_size + 6, args.hidden_size, std_init=args.noisy_std)
         self.fc_h_a = NoisyLinear(self.conv_output_size + 6, args.hidden_size, std_init=args.noisy_std)
-        self.fc_z_v = NoisyLinear(args.hidden_size, self.atoms, std_init=args.noisy_std)
-        self.fc_z_a = NoisyLinear(args.hidden_size, action_space * self.atoms, std_init=args.noisy_std)
+        self.fc_z_v = NoisyLinear(args.hidden_size, 1, std_init=args.noisy_std)
+        self.fc_z_a = NoisyLinear(args.hidden_size, action_space, std_init=args.noisy_std)
 
     def _get_conv_out(self, shape):
         o = self.convs(torch.zeros(1, *shape))
@@ -88,12 +88,7 @@ class DQN(nn.Module):
         x = torch.cat((x, a), 1)
         v = self.fc_z_v(F.relu(self.fc_h_v(x)))  # Value stream
         a = self.fc_z_a(F.relu(self.fc_h_a(x)))  # Advantage stream
-        v, a = v.view(-1, 1, self.atoms), a.view(-1, self.action_space, self.atoms)
         q = v + a - a.mean(1, keepdim=True)  # Combine streams
-        if log:  # Use log softmax for numerical stability
-            q = F.log_softmax(q, dim=2)  # Log probabilities with action over second dimension
-        else:
-            q = F.softmax(q, dim=2)  # Probabilities with action over second dimension
         return q
 
     def reset_noise(self):

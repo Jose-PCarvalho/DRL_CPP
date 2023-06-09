@@ -1,7 +1,7 @@
 env1:
   name: "env1_Full_Info_Non_Rand_Size5_Rand_Starting_Pose_Obstacle"
   base_steps: 500000
-  sensor: "camera"
+  sensor: "full information"
   sensor_range: 3
   size: 5
   min_size: 4
@@ -46,7 +46,7 @@ env3:
 env4:
   name: "env4_Full_Info_Non_Rand_Size19_Rand_Starting_Pose_Obstacle"
   base_steps: 5000000
-  sensor: "camera"
+  sensor: "full information"
   sensor_range: 2
   size: 19
   min_size: 15

@@ -170,8 +170,7 @@ class ReplayMemory():
                                device=self.device)
         R = torch.matmul(rewards, self.n_step_scaling)
         # Mask for non-terminal nth next states
-        nonterminals = torch.tensor(np.expand_dims(transitions['nonterminal'][:, self.history + self.n - 1], axis=1),
-                                    dtype=torch.float32, device=self.device)
+        nonterminals = torch.tensor(transitions['nonterminal'][:, self.history + self.n - 1],dtype=torch.float32, device=self.device)
 
         return probs, idxs, tree_idxs, states, actions, R, next_states, nonterminals, battery, next_battery, last_action, next_last_action
 
