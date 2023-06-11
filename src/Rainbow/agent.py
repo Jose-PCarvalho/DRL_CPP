@@ -44,7 +44,7 @@ class Agent:
 
         self.target_net = DQN(args, self.action_space).to(device=args.device)
 
-        self.update_target_net()
+        self.hard_update()
         self.target_net.train()
         for param in self.target_net.parameters():
             param.requires_grad = False
@@ -85,7 +85,7 @@ class Agent:
             self.target_net.reset_noise()  # Sample new target net noise
             q_target_values = self.target_net(next_states, next_battery, F.one_hot(next_last_action, 5))
             q_target = q_target_values[range(self.batch_size), argmax_indices_ns]
-
+        q_target.detach()
         target = returns + nonterminals * (self.discount ** self.n) * q_target
         loss = F.smooth_l1_loss(q_curr, target, reduction="none")
         self.online_net.zero_grad()
@@ -101,6 +101,9 @@ class Agent:
             for target_param, local_param in zip(self.target_net.parameters(), self.online_net.parameters()):
                 target_param.data.copy_(self.tau * local_param.data + (1.0 - self.tau) * target_param.data)
         self.train()
+    
+    def hard_update(self):
+        self.target_net.load_state_dict(self.online_net.state_dict())
 
     # Save model parameters on current device (don't move model between devices)
     def save(self, path, name='model.pth'):
