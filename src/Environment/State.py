@@ -46,7 +46,8 @@ class State:
         self.global_map = None
         self.position = None
         self.remaining = None
-        self.last_action = 0
+        self.last_action = [0, 0, 0]
+        self.out_of_bounds = []
         self.timesteps = None
         self.t_to_go = None
         self.optimal_steps = None
@@ -91,17 +92,21 @@ class State:
             self.remaining -= 1
             events.append(Events.NEW)
 
-        if action == self.last_action:
-            events.append(Events.REPEATED)
+        # if action == self.last_action:
+        #   events.append(Events.REPEATED)
 
-        self.last_action = action
+        self.last_action.append(action.value)
+        self.last_action.pop()
         if self.params.sensor == "laser":
             self.local_map.laser_scanner(self.position.get_position(), self.global_map, self.params.sensor_range)
         elif self.params.sensor == "camera":
             self.local_map.camera(self.position.get_position(), self.global_map, self.params.sensor_range)
 
         self.state_array.pop(0)
-        self.state_array.append(self.local_map.center_map(self.position.get_position()))
+        self.out_of_bounds.pop(0)
+        s, o = self.local_map.center_map(self.position.get_position())
+        self.state_array.append(s)
+        self.out_of_bounds.append(o)
         self.timesteps += 1
         self.t_to_go -= 1
         if self.t_to_go <= 0:
@@ -160,8 +165,9 @@ class State:
         self.local_map.visit_tile(self.position.get_position())
         if self.params.random_coverage and np.random.random() < 0.5:
             for i in range(0, random.randint(0, ceil(self.params.real_size ** 2 / 1.5))):
-                tile = (random.randint(0, self.params.real_size-1), random.randint(0, self.params.real_size-1))
-                if tile not in self.local_map.visited_list and tile in set(self.global_map.getTiles()).difference(self.global_map.obstacle_list):
+                tile = (random.randint(0, self.params.real_size - 1), random.randint(0, self.params.real_size - 1))
+                if tile not in self.local_map.visited_list and tile in set(self.global_map.getTiles()).difference(
+                        self.global_map.obstacle_list):
                     self.local_map.visit_tile(tile)
 
         if self.params.sensor == "laser":
@@ -169,7 +175,8 @@ class State:
         elif self.params.sensor == "camera":
             self.local_map.camera(self.position.get_position(), self.global_map, self.params.sensor_range)
 
-        self.remaining = len(set(self.global_map.getTiles()).difference(self.global_map.obstacle_list)) - len(self.local_map.visited_list)
+        self.remaining = len(set(self.global_map.getTiles()).difference(self.global_map.obstacle_list)) - len(
+            self.local_map.visited_list)
         if self.remaining < 1:
             self.init_episode()
         self.optimal_steps = self.remaining
@@ -177,16 +184,20 @@ class State:
         self.t_to_go = self.params.size ** 2 * 5
         self.terminated = False
         self.truncated = False
-        s = self.local_map.center_map(self.position.get_position())
-        self.state_array = [s]
-        self.last_action = Actions.NORTH
+        s, o = self.local_map.center_map(self.position.get_position())
+        self.state_array = [s, s, s]
+        self.last_action = [0, 0, 0]
+        self.out_of_bounds = [o, o, o]
 
     def partial_reset(self):
         self.t_to_go = self.params.size ** 2 * 2
         self.terminated = False
         self.truncated = False
         self.timesteps = 0
-        s = self.local_map.center_map(self.position.get_position())
-        self.state_array = [s]
+        s, o = self.local_map.center_map(self.position.get_position())
+        self.state_array.append(s)
+        self.state_array.pop(0)
+        self.out_of_bounds.append(o)
+        self.out_of_bounds.pop(0)
         if self.remaining < 1:
             self.init_episode()

@@ -70,7 +70,7 @@ parser.add_argument('--V-min', type=float, default=-625, metavar='V', help='Mini
 parser.add_argument('--V-max', type=float, default=625, metavar='V', help='Maximum of value distribution support')
 
 parser.add_argument('--model', type=str, metavar='PARAMS',
-                    default='results/Obst2/checkpoint.pth',
+                    default='results/Final/checkpoint.pth',
                     help='Pretrained model (state dict)')
 
 parser.add_argument('--memory-capacity', type=int, default=int(1e6), metavar='CAPACITY',
@@ -156,7 +156,7 @@ for e in range(number_envs):
                 state, info = env.reset(False)
                 reward_sum, done, truncated = 0, False, False
 
-            action = dqn.act_e_greedy(state[0], state[1], state[2])  # Choose an action ε-greedily
+            action = dqn.act_e_greedy(state[0], state[1], state[2],state[3])  # Choose an action ε-greedily
             state, reward, done, truncated, info = env.step(action)  # Step
 
             if args.render:

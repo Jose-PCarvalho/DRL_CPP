@@ -141,7 +141,7 @@ class GridMap:
                 self.new_tile(t, obstacle=t in full_map.obstacle_list)
 
     def center_map(self, position):
-        new_size = 37
+        new_size = max(37, max(self.height, self.width) * 2 - 1)
         # calculate the center index of the new array
         center_index = new_size // 2
 
@@ -156,7 +156,34 @@ class GridMap:
 
         # copy the original array to the center of the new array
         new_arr[:, start_i:end_i, start_j:end_j] = self.map_array
-        return new_arr
+        tiles_to_go = np.zeros((4, 4), dtype=np.int32)
+        if new_arr.shape[1] > 37:
+            start_index = center_index - 18  # (37 - 1) // 2
+            end_index = center_index + 19  # (37 + 1) // 2
+
+            perdidos_cima = start_i - start_index
+            perdidos_baixo = end_index - end_i
+            perdidos_esquerda = start_j - start_index
+            perdidos_direita = end_index - end_j
+            if perdidos_cima < 0:
+                tiles_to_go[0][0] = np.count_nonzero(new_arr[2, start_i:start_index, :])
+                tiles_to_go[0][1] = -1 * perdidos_cima
+            if perdidos_baixo < 0:
+                tiles_to_go[1][0] = np.count_nonzero(new_arr[2, end_index:end_i, :])
+                tiles_to_go[1][1] = -1 * perdidos_baixo
+            if perdidos_esquerda < 0:
+                tiles_to_go[2][0] = np.count_nonzero(new_arr[2, :, start_j:start_index])
+                tiles_to_go[2][1] = -1 * perdidos_esquerda
+            if perdidos_direita < 0:
+                tiles_to_go[3][0] = np.count_nonzero(new_arr[2, :, end_index:end_j])
+                tiles_to_go[3][1] = -1 * perdidos_direita
+
+            print(tiles_to_go)
+
+            # Extract the 37x37 array
+            new_arr = new_arr[:, start_index:end_index, start_index:end_index]
+
+        return new_arr, tiles_to_go
 
     def fix_map(self, start):
         visited = self.dfs(start)
@@ -187,7 +214,7 @@ class GridMap:
     def min_manhattan_distance(self, agent_pos):
         not_seen_list = set(self.getTiles()).difference(set(self.visited_list).union(set(self.obstacle_list)))
         if len(not_seen_list) == 0:
-            return 0 , [0,0]
+            return 0, [0, 0]
         positions = np.array(list(not_seen_list))
         distances = positions - agent_pos
         distances = np.linalg.norm(distances, ord=1, axis=1)
@@ -196,7 +223,7 @@ class GridMap:
         closest = positions[dist_idx]
         return dist, closest
 
-    def path_min_manhattan(self,agent_pos):
+    def path_min_manhattan(self, agent_pos):
         not_seen_list = set(self.getTiles()).difference(set(self.visited_list).union(set(self.obstacle_list)))
         if len(not_seen_list) == 0:
             return 0, [0, 0]

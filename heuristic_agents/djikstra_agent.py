@@ -11,7 +11,7 @@ import yaml
 with open('../configs/training_obstacles.yaml', 'rb') as f:
     conf = yaml.safe_load(f.read())  # load the config file
 
-env = Environment(EnvironmentParams(conf['env1']))
+env = Environment(EnvironmentParams(conf['env5']))
 Viz = Vizualization()
 
 while True:
@@ -22,9 +22,8 @@ while True:
         print(reward)
         # print(env.state.remaining)
         env.render()
-        #time.sleep(5)
+        time.sleep(5)
 
         observation = observation_
         if done or truncated:
             break
-

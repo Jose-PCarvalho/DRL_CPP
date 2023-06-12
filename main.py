@@ -202,7 +202,7 @@ while e < number_envs + 1:
 
         action = env.get_heuristic_action().value
         next_state, _, done, truncated, info = env.step(action)
-        val_mem.append(state[0], state[1], state[2], -1, 0.0, done, truncated)
+        val_mem.append(state[0], state[1], state[2], state[3], -1, 0.0, done, truncated)
         state = next_state
         T += 1
 
@@ -241,13 +241,13 @@ while e < number_envs + 1:
                     action = env.get_heuristic_action().value
                 else:
                     action = dqn.act(state[0], state[1],
-                                     state[2])
+                                     state[2],state[3])
             else:
                 action = pseudo_agent.select_action(state[0][-1]).value
 
             next_state, reward, done, truncated, info = env.step(action)  # Step
 
-            mem.append(state[0], state[1], state[2], action, reward, done, truncated)  # Append transition to memory
+            mem.append(state[0], state[1], state[2],state[3], action, reward, done, truncated)  # Append transition to memory
 
             # Train and test
             if T >= args.learn_start:

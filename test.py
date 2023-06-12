@@ -24,7 +24,7 @@ def test(args, T, dqn, val_mem, metrics, results_dir, env_args, evaluate=False):
                 state, info = env.reset(False)
                 reward_sum, done, truncated = 0, False, False
 
-            action = dqn.act_e_greedy(state[0], state[1],state[2])  # Choose an action ε-greedily
+            action = dqn.act_e_greedy(state[0], state[1],state[2],state[3])  # Choose an action ε-greedily
             state, reward, done, truncated, info = env.step(action)  # Step
 
             reward_sum += reward
@@ -38,8 +38,8 @@ def test(args, T, dqn, val_mem, metrics, results_dir, env_args, evaluate=False):
     # env.close()
 
     # Test Q-values over validation memory
-    for state, battery, last_action in val_mem:  # Iterate over valid states
-        T_Qs.append(dqn.evaluate_q(state, battery,last_action))
+    for state, battery, last_action, oob in val_mem:  # Iterate over valid states
+        T_Qs.append(dqn.evaluate_q(state, battery,last_action,oob))
 
     avg_reward, avg_Q, avg_overlap = sum(T_rewards) / len(T_rewards), sum(T_Qs) / len(T_Qs), sum(T_overlap) / len(
         T_overlap)

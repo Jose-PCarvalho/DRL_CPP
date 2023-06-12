@@ -7,8 +7,8 @@ import torch
 
 Transition_dtype = np.dtype(
     [('timestep', np.int32), ('state', np.uint8, (3, 37, 37)), ('battery', np.int32), ('last_action', np.int64),
-     ('action', np.int32), ('reward', np.float32),('nonterminal', np.bool_)])
-blank_trans = (0, np.zeros((3, 37, 37), dtype=np.uint8), 0, 0, 0, 0.0, False)
+     ('out_bounds', np.uint8, (4, 2)), ('action', np.int32), ('reward', np.float32), ('nonterminal', np.bool_)])
+blank_trans = (0, np.zeros((3, 37, 37), dtype=np.uint8), 0, 0, np.zeros((4, 2), dtype=np.uint8), 0, 0.0, False)
 
 
 # Segment tree data structure where parent node values are sum/max of children node values
@@ -110,11 +110,12 @@ class ReplayMemory():
             capacity)  # Store transitions in a wrap-around cyclic buffer within a sum tree for querying priorities
 
     # Adds state and action at time t, reward and terminal at time t + 1
-    def append(self, state, battery, last_action, action, reward, terminal, truncated):
+    def append(self, state, battery, last_action, out_bounds, action, reward, terminal, truncated):
         state = torch.tensor(state[-1], dtype=torch.uint8, device=torch.device('cpu'))
         battery = torch.tensor(battery, dtype=torch.int32, device=torch.device('cpu'))
-        last_action = torch.tensor(last_action, dtype=torch.int32, device=torch.device('cpu'))
-        self.transitions.append((self.t, state, battery, last_action, action, reward, not terminal),
+        last_action = torch.tensor(last_action[-1], dtype=torch.int32, device=torch.device('cpu'))
+        out_bounds = torch.tensor(out_bounds[-1], dtype=torch.int32, device=torch.device('cpu'))
+        self.transitions.append((self.t, state, battery, last_action, out_bounds, action, reward, not terminal),
                                 self.transitions.max)  # Store new transition with maximum priority
         self.t = 0 if terminal or truncated else self.t + 1  # Start new episodes with t = 0
 
@@ -153,6 +154,7 @@ class ReplayMemory():
         all_states = transitions['state']
         all_batteries = transitions['battery'].copy()
         all_last_actions = transitions['last_action'].copy()
+        all_out_bounds = transitions['out_bounds'].copy()
         states = torch.tensor(all_states[:, :self.history], device=self.device, dtype=torch.float32)
         next_states = torch.tensor(all_states[:, self.n:self.n + self.history], device=self.device,
                                    dtype=torch.float32)  # Discrete actions to be used as index
@@ -160,8 +162,13 @@ class ReplayMemory():
         battery = torch.tensor(all_batteries[:, self.history - 1], device=self.device, dtype=torch.int32)
         next_battery = torch.tensor(all_batteries[:, -1], device=self.device, dtype=torch.int32)
 
-        last_action = torch.tensor(all_last_actions[:, self.history - 1], device=self.device, dtype=torch.int64)
-        next_last_action = torch.tensor(all_last_actions[:, -1], device=self.device, dtype=torch.int64)
+        last_action = torch.tensor(all_last_actions[:, :self.history], device=self.device, dtype=torch.int64)
+        next_last_action = torch.tensor(all_last_actions[:, self.n:self.n + self.history], device=self.device,
+                                        dtype=torch.int64)
+
+        out_bounds = torch.tensor(all_out_bounds[:, :self.history], device=self.device, dtype=torch.int64)
+        next_out_bounds = torch.tensor(all_out_bounds[:, self.n:self.n + self.history], device=self.device,
+                                       dtype=torch.int64)
 
         actions = torch.tensor(np.copy(transitions['action'][:, self.history - 1]), dtype=torch.int64,
                                device=self.device)
@@ -170,21 +177,24 @@ class ReplayMemory():
                                device=self.device)
         R = torch.matmul(rewards, self.n_step_scaling)
         # Mask for non-terminal nth next states
-        nonterminals = torch.tensor(transitions['nonterminal'][:, self.history + self.n - 1],dtype=torch.float32, device=self.device)
+        nonterminals = torch.tensor(np.expand_dims(transitions['nonterminal'][:, self.history + self.n - 1], axis=1),
+                                    dtype=torch.float32, device=self.device)
 
-        return probs, idxs, tree_idxs, states, actions, R, next_states, nonterminals, battery, next_battery, last_action, next_last_action
+        return probs, idxs, tree_idxs, states, actions, R, next_states, nonterminals, battery, next_battery, last_action, next_last_action, \
+               out_bounds, next_out_bounds
 
     def sample(self, batch_size):
         p_total = self.transitions.total()  # Retrieve sum of all priorities (used to create a normalised probability distribution)
         probs, idxs, tree_idxs, states, actions, returns, next_states, nonterminals, battery, next_battery, \
-        last_action, next_last_action = self._get_samples_from_segments(batch_size, p_total)  # Get batch of valid samples
+        last_action, next_last_action, out_bounds, next_out_bounds = self._get_samples_from_segments(batch_size,
+                                                                                                     p_total)  # Get batch of valid samples
         probs = probs / p_total  # Calculate normalised probabilities
         capacity = self.capacity if self.transitions.full else self.transitions.index
         weights = (capacity * probs) ** -self.priority_weight  # Compute importance-sampling weights w
         weights = torch.tensor(weights / weights.max(), dtype=torch.float32,
                                device=self.device)  # Normalise by max importance-sampling weight from batch
-        return tree_idxs, states, actions, returns, next_states, nonterminals, weights, battery, next_battery,\
-               last_action, next_last_action
+        return tree_idxs, states, actions, returns, next_states, nonterminals, weights, battery, next_battery, \
+               last_action, next_last_action, out_bounds, next_out_bounds
 
     def update_priorities(self, idxs, priorities):
         priorities = np.power(priorities, self.priority_exponent)
@@ -212,9 +222,13 @@ class ReplayMemory():
         battery = torch.tensor(transitions['battery'][-1], dtype=torch.int32,
                                device=self.device)  # Agent will turn into batch
 
-        last_action = torch.tensor(transitions['last_action'][-1], dtype=torch.int64,
-                               device=self.device)  # Agent will turn into batch
+        l_a = transitions['last_action']
+        last_action = torch.tensor(l_a.copy(), dtype=torch.int64,
+                                   device=self.device)  # Agent will turn into batch
+        o_b = transitions['out_bounds']
+        out_bounds = torch.tensor(o_b.copy(), dtype=torch.int64,
+                                  device=self.device)  # Agent will turn into batch
         self.current_idx += 1
-        return state, battery, last_action
+        return state, battery, last_action, out_bounds
 
     next = __next__  # Alias __next__ for Python 2 compatibility

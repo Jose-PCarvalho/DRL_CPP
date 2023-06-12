@@ -56,34 +56,36 @@ class Agent:
         self.online_net.reset_noise()
 
     # Acts based on single state (no batch)
-    def act(self, state, battery, last_action):
+    def act(self, state, battery, last_action, out_bounds):
         with torch.no_grad():
             # state = torch.tensor(state[-1], dtype=torch.float32, device='cuda')
             state = torch.tensor(state, dtype=torch.float32, device=self.device)
             battery = torch.tensor(battery, dtype=torch.int32, device=self.device)
             last_action = F.one_hot(torch.tensor(last_action, dtype=torch.int64, device=self.device), 5)
+            out_bounds = torch.tensor(out_bounds, dtype=torch.int32, device=self.device)
             return (self.online_net(state.unsqueeze(0), battery.unsqueeze(0),
-                                    last_action.unsqueeze(0))).argmax(1).item()
+                                    last_action.unsqueeze(0), out_bounds.unsqueeze(0))).argmax(1).item()
 
     # Acts with an ε-greedy policy (used for evaluation only)
-    def act_e_greedy(self, state, battery, last_action,
+    def act_e_greedy(self, state, battery, last_action, out_bounds,
                      epsilon=0.00001):  # High ε can reduce evaluation scores drastically
         return np.random.randint(0, self.action_space) if np.random.random() < epsilon else self.act(state, battery,
-                                                                                                     last_action)
+                                                                                                     last_action,
+                                                                                                     out_bounds)
 
     def learn(self, mem):
         # Sample transitions
         idxs, states, actions, returns, next_states, nonterminals, weights, battery, next_battery, last_action, \
-        next_last_action = mem.sample(self.batch_size)
+        next_last_action, out_bounds, next_out_bounds = mem.sample(self.batch_size)
         # Calculate current state probabilities (online network noise already sampled)
-        q_values = self.online_net(states, battery, F.one_hot(last_action, 5))
+        q_values = self.online_net(states, battery, F.one_hot(last_action, 5), out_bounds)
         q_curr = q_values[range(self.batch_size), actions]
         with torch.no_grad():
             # Calculate nth next state probabilities
-            q_online_value = self.online_net(next_states, next_battery, F.one_hot(next_last_action, 5))
+            q_online_value = self.online_net(next_states, next_battery, F.one_hot(next_last_action, 5), next_out_bounds)
             argmax_indices_ns = q_online_value.argmax(1)  #
             self.target_net.reset_noise()  # Sample new target net noise
-            q_target_values = self.target_net(next_states, next_battery, F.one_hot(next_last_action, 5))
+            q_target_values = self.target_net(next_states, next_battery, F.one_hot(next_last_action, 5), next_out_bounds)
             q_target = q_target_values[range(self.batch_size), argmax_indices_ns]
         q_target.detach()
         target = returns + nonterminals * (self.discount ** self.n) * q_target
@@ -101,7 +103,7 @@ class Agent:
             for target_param, local_param in zip(self.target_net.parameters(), self.online_net.parameters()):
                 target_param.data.copy_(self.tau * local_param.data + (1.0 - self.tau) * target_param.data)
         self.train()
-    
+
     def hard_update(self):
         self.target_net.load_state_dict(self.online_net.state_dict())
 
@@ -110,11 +112,11 @@ class Agent:
         torch.save(self.online_net.state_dict(), os.path.join(path, name))
 
     # Evaluates Q-value based on single state (no batch)
-    def evaluate_q(self, state, battery, last_action):
+    def evaluate_q(self, state, battery, last_action,out_bounds):
         with torch.no_grad():
             last_action = F.one_hot(last_action, 5)
             return (self.online_net(state.unsqueeze(0), battery.unsqueeze(0),
-                                    last_action.unsqueeze(0))).max(1)[0].item()
+                                    last_action.unsqueeze(0)),out_bounds.unsqueeze(0)).max(1)[0].item()
 
     def train(self):
         self.online_net.train()

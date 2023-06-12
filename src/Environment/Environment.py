@@ -66,7 +66,9 @@ class Environment:
         # self.viz.render_center(self.state.local_map.center_map(self.stateposition.get_position()).transpose(2, 0, 1))
 
     def get_observation(self):
-        return (np.array(self.state.state_array), self.state.t_to_go, self.state.last_action.value)
+        oob = np.array(self.state.out_of_bounds)
+        oob = oob[:, :, 0:2]
+        return (np.array(self.state.state_array), self.state.t_to_go, np.array(self.state.last_action),oob)
 
     def get_info(self):
         if self.remaining == self.state.remaining:
@@ -85,15 +87,17 @@ class Environment:
         if self.position_locked == False:
             positions, indices = self.state.local_map.path_min_manhattan(self.state.position.get_position())
             for i in indices:
-                path = self.state.local_map.dijkstra_search(self.state.position.get_position(),(positions[i][0], positions[i][1]))
+                path = self.state.local_map.dijkstra_search(self.state.position.get_position(),
+                                                            (positions[i][0], positions[i][1]))
                 if len(path) != 0:
                     self.position_locked = True
                     self.heuristic_position = positions[i]
                     break
         else:
-            path = self.state.local_map.dijkstra_search(self.state.position.get_position(),(self.heuristic_position[0], self.heuristic_position[1]))
+            path = self.state.local_map.dijkstra_search(self.state.position.get_position(),
+                                                        (self.heuristic_position[0], self.heuristic_position[1]))
         next = path[0]
-        if np.array_equal(next,self.heuristic_position):
+        if np.array_equal(next, self.heuristic_position):
             self.position_locked = False
             self.heuristic_position = None
         diff = np.array(next) - np.array(self.state.position.get_position())
