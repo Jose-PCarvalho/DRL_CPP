@@ -116,7 +116,7 @@ class Agent:
         with torch.no_grad():
             last_action = F.one_hot(last_action, 5)
             return (self.online_net(state.unsqueeze(0), battery.unsqueeze(0),
-                                    last_action.unsqueeze(0)),out_bounds.unsqueeze(0)).max(1)[0].item()
+                                    last_action.unsqueeze(0),out_bounds.unsqueeze(0))).max(1)[0].item()
 
     def train(self):
         self.online_net.train()

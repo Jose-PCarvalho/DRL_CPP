@@ -72,7 +72,7 @@ parser.add_argument('--id', type=str, default='Test', help='Experiment ID')
 parser.add_argument('--disable-cuda', action='store_true', help='Disable CUDA')
 parser.add_argument('--T-max', type=int, default=int(70e4), metavar='STEPS',
                     help='Number of training steps (4x number of frames)')
-parser.add_argument('--history-length', type=int, default=1, metavar='T', help='Number of consecutive states processed')
+parser.add_argument('--history-length', type=int, default=3, metavar='T', help='Number of consecutive states processed')
 parser.add_argument('--architecture', type=str, default='data-efficient', choices=['canonical', 'data-efficient'],
                     metavar='ARCH', help='Network architecture')
 parser.add_argument('--hidden-size', type=int, default=512, metavar='SIZE', help='Network hidden size')
