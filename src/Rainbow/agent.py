@@ -59,7 +59,7 @@ class Agent:
     def act(self, state, battery, last_action, out_bounds):
         with torch.no_grad():
             # state = torch.tensor(state[-1], dtype=torch.float32, device='cuda')
-            state = torch.tensor(state, dtype=torch.float32, device=self.device)
+            state = torch.tensor(state, dtype=torch.float32, device=self.device)/255
             battery = torch.tensor(battery, dtype=torch.int32, device=self.device)
             last_action = F.one_hot(torch.tensor(last_action, dtype=torch.int64, device=self.device), 5)
             out_bounds = torch.tensor(out_bounds, dtype=torch.int32, device=self.device)

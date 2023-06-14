@@ -217,7 +217,7 @@ class ReplayMemory():
                                           transitions_firsts[t + 1])  # If future frame has timestep 0
         transitions[blank_mask] = blank_trans
         state = torch.tensor(transitions['state'], dtype=torch.float32,
-                             device=self.device)  # Agent will turn into batch
+                             device=self.device)/255  # Agent will turn into batch
         b = transitions['battery']
         battery = torch.tensor(transitions['battery'][-1], dtype=torch.int32,
                                device=self.device)  # Agent will turn into batch
