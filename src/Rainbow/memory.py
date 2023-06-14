@@ -155,9 +155,9 @@ class ReplayMemory():
         all_batteries = transitions['battery'].copy()
         all_last_actions = transitions['last_action'].copy()
         all_out_bounds = transitions['out_bounds'].copy()
-        states = torch.tensor(all_states[:, :self.history], device=self.device, dtype=torch.float32)
+        states = torch.tensor(all_states[:, :self.history], device=self.device, dtype=torch.float32) / 255
         next_states = torch.tensor(all_states[:, self.n:self.n + self.history], device=self.device,
-                                   dtype=torch.float32)  # Discrete actions to be used as index
+                                   dtype=torch.float32) / 255  # Discrete actions to be used as index
 
         battery = torch.tensor(all_batteries[:, self.history - 1], device=self.device, dtype=torch.int32)
         next_battery = torch.tensor(all_batteries[:, -1], device=self.device, dtype=torch.int32)
