@@ -152,13 +152,13 @@ def graph_to_RGB_array(a):
 
     for i in range(a.shape[1]):
         for j in range(a.shape[2]):
-            if a[0, i, j] == 1:
+            if a[0, i, j] == 255:
                 rgb[:, i, j] = [255, 0, 0]
             elif a[0, i, j] == 0 and a[1, i, j] == 0 and a[2, i, j] == 0:
-                rgb[:, i, j] = [0,0,255]
-            elif a[1, i, j] == 1:
+                rgb[:, i, j] = [0, 0, 255]
+            elif a[1, i, j] == 255:
                 rgb[:, i, j] = [0, 0, 0]
-            elif a[2, i, j] == 1:
+            elif a[2, i, j] == 255:
                 rgb[:, i, j] = [255, 255, 255]
             else:
                 rgb[:, i, j] = [0, 255, 0]

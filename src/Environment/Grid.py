@@ -81,7 +81,7 @@ class GridMap:
     def visit_tile(self, tile):
         if tile not in self.visited_list:
             self.visited_list.append(tile)
-            self.map_array[:, tile[0], tile[1]] = [1, 0, 0]
+            self.map_array[:, tile[0], tile[1]] = [255, 0, 0]
 
     def graph_to_array(self):
         a = np.zeros((3, self.height, self.width),
@@ -90,11 +90,11 @@ class GridMap:
             for j in range(self.width):
                 tile = (i, j)
                 if tile in self.visited_list:
-                    a[:, i, j] = [1, 0, 0]
+                    a[:, i, j] = [255, 0, 0]
                 elif tile in self.obstacle_list:
-                    a[:, i, j] = [0, 1, 0]
+                    a[:, i, j] = [0, 255, 0]
                 elif tile in (self.getTiles()) and tile not in (set(self.visited_list).union(set(self.obstacle_list))):
-                    a[:, i, j] = [0, 0, 1]
+                    a[:, i, j] = [0, 0, 255]
         return a
 
     def laser_scanner(self, tile, full_map, r):
@@ -146,42 +146,66 @@ class GridMap:
         center_index = new_size // 2
 
         # create a new array of zeros with the desired size
-        new_arr = np.zeros((3, new_size, new_size), dtype=np.uint8)
-        new_arr[1, :, :] = 1
+        new_arr = np.zeros((3, new_size + 4, new_size + 4), dtype=np.uint8)
+        new_arr[1, :, :] = 255
         # calculate the indices of the original array that should be copied to the new array
-        start_i = center_index - position[0]
+        start_i = center_index - position[0] + 2
         end_i = start_i + self.map_array.shape[1]
-        start_j = center_index - position[1]
+        start_j = center_index - position[1] + 2
         end_j = start_j + self.map_array.shape[2]
-
         # copy the original array to the center of the new array
         new_arr[:, start_i:end_i, start_j:end_j] = self.map_array
         tiles_to_go = np.zeros((4, 4), dtype=np.int32)
-        if new_arr.shape[1] > 37:
-            start_index = center_index - 18  # (37 - 1) // 2
-            end_index = center_index + 19  # (37 + 1) // 2
+        if new_size > 37:
+            start_index = center_index - 18 + 2  # (37 - 1) // 2
+            end_index = center_index + 19 + 2  # (37 + 1) // 2
+            missing_up = start_i - start_index
+            missing_down = end_index - end_i
+            missing_left = start_j - start_index
+            missing_right = end_index - end_j
 
-            perdidos_cima = start_i - start_index
-            perdidos_baixo = end_index - end_i
-            perdidos_esquerda = start_j - start_index
-            perdidos_direita = end_index - end_j
-            if perdidos_cima < 0:
+            up_edge = np.zeros((3, 41))
+            up_edge[1, :] = 255
+            down_edge = np.zeros((3, 41))
+            down_edge[1, :] = 255
+            left_edge = np.zeros((3, 41))
+            left_edge[1, :] = 255
+            right_edge = np.zeros((3, 41))
+            right_edge[1, :] = 255
+
+            if missing_up < 0:
                 tiles_to_go[0][0] = np.count_nonzero(new_arr[2, start_i:start_index, :])
-                tiles_to_go[0][1] = -1 * perdidos_cima
-            if perdidos_baixo < 0:
+                tiles_to_go[0][1] = -1 * missing_up
+                up_edge = compress_edge(np.mean(new_arr[:, start_i:start_index, :], axis=1), start_j, end_j,
+                                        missing_left, missing_right)
+            if missing_down < 0:
                 tiles_to_go[1][0] = np.count_nonzero(new_arr[2, end_index:end_i, :])
-                tiles_to_go[1][1] = -1 * perdidos_baixo
-            if perdidos_esquerda < 0:
+                tiles_to_go[1][1] = -1 * missing_down
+                down_edge = compress_edge(np.mean(new_arr[:, end_index:end_i, :], axis=1), start_j, end_j,
+                                          missing_left, missing_right)
+            if missing_left < 0:
                 tiles_to_go[2][0] = np.count_nonzero(new_arr[2, :, start_j:start_index])
-                tiles_to_go[2][1] = -1 * perdidos_esquerda
-            if perdidos_direita < 0:
+                tiles_to_go[2][1] = -1 * missing_left
+                left_edge = compress_edge(np.mean(new_arr[:, :, start_j:start_index], axis=2), start_i, end_i,
+                                          missing_up, missing_down)
+            if missing_right < 0:
                 tiles_to_go[3][0] = np.count_nonzero(new_arr[2, :, end_index:end_j])
-                tiles_to_go[3][1] = -1 * perdidos_direita
-
-            print(tiles_to_go)
-
+                tiles_to_go[3][1] = -1 * missing_right
+                right_edge = compress_edge(np.mean(new_arr[:, :, end_index:end_j], axis=2), start_i, end_i,
+                                           missing_up, missing_down)
             # Extract the 37x37 array
-            new_arr = new_arr[:, start_index:end_index, start_index:end_index]
+            inner_array = new_arr[:, start_index:end_index, start_index:end_index]
+            new_arr = np.zeros((3, 41, 41), dtype=np.uint8)
+            new_arr[1, :, :] = 255
+            new_arr[:, 1, :], new_arr[:, -2, :], new_arr[:, :, 1], new_arr[:, :, -2] = up_edge, down_edge, left_edge \
+                , right_edge
+
+            new_arr[:, 1, 1] = (up_edge[:, 1] + left_edge[:, 1]) // 2
+
+            new_arr[:, 1, -2] = (up_edge[:, -2] + right_edge[:, 1]) // 2
+            new_arr[:, -2, 1] = (down_edge[:, 1] + left_edge[:, -2]) // 2
+            new_arr[:, -2, -2] = (down_edge[:, -2] + right_edge[:, -2]) // 2
+            new_arr[:, 2:-2, 2:-2] = inner_array
 
         return new_arr, tiles_to_go
 
@@ -266,3 +290,21 @@ class GridMap:
             current = came_from[current]
         path.reverse()  # optional
         return path
+
+
+def compress_edge(edge, start_i, end_i, begin_offset, end_offset):
+    use_begin_edge = 0
+    if begin_offset < 0:
+        use_begin_edge = 1
+    use_end_edge =0
+    if end_offset <0:
+        use_end_edge =1
+    start_offset = min(0, begin_offset)
+    finish_offset = min(0, end_offset)
+    b_offset = max(begin_offset, 0)
+    new_edge = np.zeros((3, 41), dtype=np.uint16)
+    new_edge[1, :] = 255
+    edge = edge[:, (start_i - start_offset - use_begin_edge):(end_i + finish_offset + use_end_edge)]
+    edge_size = edge.shape[1]
+    new_edge[:, (b_offset + 2 - use_begin_edge):(b_offset + 2 + edge_size - use_begin_edge)] = edge
+    return new_edge

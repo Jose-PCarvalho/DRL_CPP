@@ -48,8 +48,8 @@ env4:
   base_steps: 5000000
   sensor: "full information"
   sensor_range: 2
-  size: 19
-  min_size: 9
+  size: 25
+  min_size: 25
   random_size: true
   obstacles_random: true
   number_obstacles: 30
@@ -57,4 +57,4 @@ env4:
   starting_position_corner : false
   starting_position_random : true
   map_config : 'empty'
-  random_coverage : true
+  random_coverage : false

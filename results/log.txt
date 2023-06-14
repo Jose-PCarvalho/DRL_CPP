@@ -1,1 +1,0 @@
-[2023-06-13T01:16:59] T = 2500 / 500000 | env: env1_Full_Info_Non_Rand_Size5_Rand_Starting_Pose_Obstacle | Avg. reward: -245.6 | Avg. Q: -1.658653924047947 | Avg. Overlap: 0.9823999999999999
