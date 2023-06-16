@@ -94,7 +94,7 @@ parser.add_argument('--norm-clip', type=float, default=2.5, metavar='NORM', help
 parser.add_argument('--learn-start', type=int, default=int(2e3), metavar='STEPS',
                     help='Number of steps before starting training')
 parser.add_argument('--evaluate', action='store_true', help='Evaluate only')
-parser.add_argument('--evaluation-interval', type=int, default=25000, metavar='STEPS',
+parser.add_argument('--evaluation-interval', type=int, default=2500, metavar='STEPS',
                     help='Number of training steps between evaluations')
 parser.add_argument('--evaluation-episodes', type=int, default=5, metavar='N',
                     help='Number of evaluation episodes to average over')

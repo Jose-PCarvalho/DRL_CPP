@@ -81,20 +81,20 @@ class GridMap:
     def visit_tile(self, tile):
         if tile not in self.visited_list:
             self.visited_list.append(tile)
-            self.map_array[:, tile[0], tile[1]] = [255, 0, 0]
+            self.map_array[:, tile[0], tile[1]] = [255, 0, 0, 0]
 
     def graph_to_array(self):
-        a = np.zeros((3, self.height, self.width),
+        a = np.zeros((4, self.height, self.width),
                      dtype=np.uint8)  # 0 -> visited, #2 -> obstacles 3->not-seen
         for i in range(self.height):
             for j in range(self.width):
                 tile = (i, j)
                 if tile in self.visited_list:
-                    a[:, i, j] = [255, 0, 0]
+                    a[:, i, j] = [255, 0, 0, 0]
                 elif tile in self.obstacle_list:
-                    a[:, i, j] = [0, 255, 0]
+                    a[:, i, j] = [0, 255, 0, 0]
                 elif tile in (self.getTiles()) and tile not in (set(self.visited_list).union(set(self.obstacle_list))):
-                    a[:, i, j] = [0, 0, 255]
+                    a[:, i, j] = [0, 0, 255, 0]
         return a
 
     def laser_scanner(self, tile, full_map, r):
@@ -140,13 +140,17 @@ class GridMap:
             if t in full_map_tiles and t not in local_map_tiles and all(cord >= 0 for cord in t):
                 self.new_tile(t, obstacle=t in full_map.obstacle_list)
 
+    def update_agent_position(self, old_position, new_position):
+        self.map_array[3, old_position[0], old_position[1]] = 0
+        self.map_array[3, new_position[0], new_position[1]] = 255
+
     def center_map(self, position):
         new_size = max(37, max(self.height, self.width) * 2 - 1)
         # calculate the center index of the new array
         center_index = new_size // 2
 
         # create a new array of zeros with the desired size
-        new_arr = np.zeros((3, new_size + 4, new_size + 4), dtype=np.uint8)
+        new_arr = np.zeros((4, new_size + 4, new_size + 4), dtype=np.uint8)
         new_arr[1, :, :] = 255
         # calculate the indices of the original array that should be copied to the new array
         start_i = center_index - position[0] + 2
@@ -195,7 +199,7 @@ class GridMap:
                                            missing_up, missing_down)
             # Extract the 37x37 array
             inner_array = new_arr[:, start_index:end_index, start_index:end_index]
-            new_arr = np.zeros((3, 41, 41), dtype=np.uint8)
+            new_arr = np.zeros((4, 41, 41), dtype=np.uint8)
             new_arr[1, :, :] = 255
             new_arr[:, 1, :], new_arr[:, -2, :], new_arr[:, :, 1], new_arr[:, :, -2] = up_edge, down_edge, left_edge \
                 , right_edge
@@ -296,9 +300,9 @@ def compress_edge(edge, start_i, end_i, begin_offset, end_offset):
     use_begin_edge = 0
     if begin_offset < 0:
         use_begin_edge = 1
-    use_end_edge =0
-    if end_offset <0:
-        use_end_edge =1
+    use_end_edge = 0
+    if end_offset < 0:
+        use_end_edge = 1
     start_offset = min(0, begin_offset)
     finish_offset = min(0, end_offset)
     b_offset = max(begin_offset, 0)

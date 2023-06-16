@@ -94,7 +94,7 @@ class State:
 
         # if action == self.last_action:
         #   events.append(Events.REPEATED)
-
+        self.local_map.update_agent_position((old_x, old_y), (self.position.x, self.position.y))
         self.last_action.append(action.value)
         self.last_action.pop()
         if self.params.sensor == "laser":
@@ -166,6 +166,8 @@ class State:
             self.local_map = GridMap(start=self.position.get_position())
 
         self.local_map.visit_tile(self.position.get_position())
+        self.local_map.update_agent_position(self.position.get_position(), self.position.get_position())
+
         if self.params.random_coverage and np.random.random() < 0.5:
             for i in range(0, random.randint(0, ceil(self.params.real_size ** 2 / 1.5))):
                 tile = (random.randint(0, self.params.real_size - 1), random.randint(0, self.params.real_size - 1))
@@ -211,6 +213,7 @@ class State:
         else:
             self.local_map = GridMap(start=self.position.get_position())
         self.local_map.visit_tile(self.position.get_position())
+        self.local_map.update_agent_position(self.position.get_position(), self.position.get_position())
         if self.params.random_coverage and np.random.random() < 0.5:
             for i in range(0, random.randint(0, ceil(self.params.real_size ** 2 / 1.5))):
                 tile = (random.randint(0, self.params.real_size - 1), random.randint(0, self.params.real_size - 1))
