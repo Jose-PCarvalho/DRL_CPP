@@ -205,9 +205,7 @@ class State:
         if self.remaining < 1:
             self.init_episode()
 
-    def init_from_map(self, mapa):
-        self.global_map = mapa
-
+    def init_from_map(self):
         if self.params.sensor == "full information":
             self.local_map = self.global_map
         else:

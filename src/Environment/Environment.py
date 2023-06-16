@@ -62,7 +62,8 @@ class Environment:
                     else:
                         self.state = self.env_params.dataset[self.env_params.state_ptr]
                         self.env_params.state_ptr += 1
-
+                    if not self.env_params.load_state:
+                        self.state.init_from_map()
                 else:
                     self.state.init_episode()
 
