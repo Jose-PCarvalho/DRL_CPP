@@ -1,18 +1,30 @@
+import bz2
+import copy
+import pickle
 import time
 
 from src.Environment.Reward import *
-from src.Environment.Actions import *
-from src.Environment.Grid import *
 from src.Environment.State import *
 from src.Environment.Actions import *
 from src.Environment.Vizualization import *
-import tqdm
+
+
+def load_memory(memory_path):
+    with bz2.open(memory_path, 'rb') as zipped_pickle_file:
+        return pickle.load(zipped_pickle_file)
 
 
 class EnvironmentParams:
     def __init__(self, args):
         self.state_params = StateParams(args)
         self.reward_params = RewardParams(self.state_params.size)
+        if args['dataset_path'] != 'empty':
+            self.dataset = load_memory(args['dataset_path'])
+        else:
+            self.dataset = None
+        self.load_state = args['load_state']
+        self.load_random = args['load_random']
+        self.state_ptr = 0
 
 
 class Environment:
@@ -22,6 +34,7 @@ class Environment:
         self.episode_count = 0
         self.viz = Vizualization()
         self.params = params.state_params
+        self.env_params = params
         self.stall_counter = 0
         self.remaining = 0  ## Only for stalling purposes, the actual variable is in the state.
         self.interesting_states = []
@@ -43,7 +56,16 @@ class Environment:
             if len_states > 1 and np.random.random() < 0.5 and training:
                 self.state = self.interesting_states.pop(0)
             else:
-                self.state.init_episode()
+                if self.env_params.dataset is not None:
+                    if self.env_params.load_random:
+                        self.state = np.random.choice(self.env_params.dataset)
+                    else:
+                        self.state = self.env_params.dataset[self.env_params.state_ptr]
+                        self.env_params.state_ptr += 1
+
+                else:
+                    self.state.init_episode()
+
                 if training:
                     self.interesting_states.append(self.state)
 
@@ -68,7 +90,7 @@ class Environment:
     def get_observation(self):
         oob = np.array(self.state.out_of_bounds)
         oob = oob[:, :, 0:2]
-        return (np.array(self.state.state_array), self.state.t_to_go, np.array(self.state.last_action),oob)
+        return (np.array(self.state.state_array), self.state.t_to_go, np.array(self.state.last_action), oob)
 
     def get_info(self):
         if self.remaining == self.state.remaining:

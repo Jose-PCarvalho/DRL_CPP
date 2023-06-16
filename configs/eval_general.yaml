@@ -1,7 +1,7 @@
 env1:
   name: "env1_Full_Info_Non_Rand_Size5_Rand_Starting_Pose_Obstacle"
   base_steps: 1000000
-  sensor: "camera"
+  sensor: "full information"
   sensor_range: 3
   size: 5
   min_size: 4
@@ -13,6 +13,9 @@ env1:
   starting_position_random : true
   map_config : 'empty'
   random_coverage : false
+  dataset_path : 'maps/datasets/full_info_5.pth'
+  load_state : true
+  load_random : true
 env2:
   name: "env2_Full_Info_Non_Rand_Size10_Rand_Starting_Pose_Obstacle"
   base_steps: 3500000
@@ -28,6 +31,9 @@ env2:
   starting_position_random : true
   map_config : 'empty'
   random_coverage : false
+  dataset_path: 'empty'
+  load_state: false
+  load_random: false
 env3:
   name: "env3_Full_Info_Non_Rand_Size15_Rand_Starting_Pose_Obstacle"
   base_steps: 5500000
@@ -43,6 +49,9 @@ env3:
   starting_position_random : true
   map_config : 'empty'
   random_coverage : false
+  dataset_path: 'empty'
+  load_state: false
+  load_random: false
 env4:
   name: "env4_Full_Info_Non_Rand_Size19_Rand_Starting_Pose_Obstacle"
   base_steps: 15000000
@@ -58,6 +67,9 @@ env4:
   starting_position_random : true
   map_config : 'empty'
   random_coverage : false
+  dataset_path: 'empty'
+  load_state: false
+  load_random: false
 #env5:
 #  name: "Final Boss"
 #  base_steps: 20000000

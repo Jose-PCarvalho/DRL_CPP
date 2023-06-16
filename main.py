@@ -24,13 +24,6 @@ def log(s, log_dir=None):
             file.write(('[' + str(datetime.now().strftime('%Y-%m-%dT%H:%M:%S')) + '] ' + s + '\n'))
 
 
-def load_memory(memory_path, disable_bzip):
-    if disable_bzip:
-        with open(memory_path, 'rb') as pickle_file:
-            return pickle.load(pickle_file)
-    else:
-        with bz2.open(memory_path, 'rb') as zipped_pickle_file:
-            return pickle.load(zipped_pickle_file)
 
 
 def save_memory(memory, memory_path, disable_bzip):

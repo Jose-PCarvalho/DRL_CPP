@@ -119,6 +119,7 @@ class State:
         return events
 
     def init_episode(self):
+
         if self.params.random_size:
             width = random.randint(self.params.min_size, self.params.size)
             height = width
@@ -130,6 +131,7 @@ class State:
 
         if self.params.starting_position_random:
             self.position = Position(random.randint(0, height - 1), random.randint(0, width - 1))
+
         elif self.params.starting_position_corner:
             corners = [(0, 0), (self.params.real_size - 1, 0), (self.params.real_size - 1, self.params.real_size - 1),
                        (0, self.params.real_size - 1)]
@@ -155,6 +157,7 @@ class State:
                         obstacles += 1
 
         self.global_map = GridMap(mapa)
+
         if self.params.map_data is not None or self.params.number_obstacles > 0:
             self.global_map.fix_map(self.position.get_position())
         if self.params.sensor == "full information":
@@ -201,3 +204,37 @@ class State:
         self.out_of_bounds.pop(0)
         if self.remaining < 1:
             self.init_episode()
+
+    def init_from_map(self, mapa):
+        self.global_map = mapa
+
+        if self.params.sensor == "full information":
+            self.local_map = self.global_map
+        else:
+            self.local_map = GridMap(start=self.position.get_position())
+        self.local_map.visit_tile(self.position.get_position())
+        if self.params.random_coverage and np.random.random() < 0.5:
+            for i in range(0, random.randint(0, ceil(self.params.real_size ** 2 / 1.5))):
+                tile = (random.randint(0, self.params.real_size - 1), random.randint(0, self.params.real_size - 1))
+                if tile not in self.local_map.visited_list and tile in set(self.global_map.getTiles()).difference(
+                        self.global_map.obstacle_list):
+                    self.local_map.visit_tile(tile)
+
+        if self.params.sensor == "laser":
+            self.local_map.laser_scanner(self.position.get_position(), self.global_map, self.params.sensor_range)
+        elif self.params.sensor == "camera":
+            self.local_map.camera(self.position.get_position(), self.global_map, self.params.sensor_range)
+
+        self.remaining = len(set(self.global_map.getTiles()).difference(self.global_map.obstacle_list)) - len(
+            self.local_map.visited_list)
+        if self.remaining < 1:
+            self.init_episode()
+        self.optimal_steps = self.remaining
+        self.timesteps = 0
+        self.t_to_go = self.params.size ** 2 * 5
+        self.terminated = False
+        self.truncated = False
+        s, o = self.local_map.center_map(self.position.get_position())
+        self.state_array = [s, s, s]
+        self.last_action = [0, 0, 0]
+        self.out_of_bounds = [o, o, o]

@@ -70,7 +70,7 @@ parser.add_argument('--V-min', type=float, default=-625, metavar='V', help='Mini
 parser.add_argument('--V-max', type=float, default=625, metavar='V', help='Maximum of value distribution support')
 
 parser.add_argument('--model', type=str, metavar='PARAMS',
-                    default='results/final/checkpoint.pth',
+                    default='results/Test/checkpoint.pth',
                     help='Pretrained model (state dict)')
 
 parser.add_argument('--memory-capacity', type=int, default=int(1e6), metavar='CAPACITY',
@@ -164,9 +164,10 @@ for e in range(number_envs):
             if done or truncated:
                 if not truncated:
 
-                    print("episode ", t, " overlap: ", env.rewards.get_overlap())
+                    print("env: ", e+1, " episode ", t, " overlap: ", env.rewards.get_overlap())
                     T_overlap[e].append(env.rewards.get_overlap())
                 else:
+
                     not_finished[e] += 1
                 break
 

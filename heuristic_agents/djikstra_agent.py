@@ -1,4 +1,5 @@
 import itertools
+import sys
 
 from src.Environment.Environment import *
 
@@ -33,12 +34,12 @@ with open('../configs/training_obstacles.yaml', 'rb') as f:
 
 env = Environment(EnvironmentParams(conf['env4']))
 Viz = Vizualization()
-
+sys.setrecursionlimit(2000)
 while True:
     observation, _ = env.reset()
     env.render()
     for t in itertools.count():
-        observation_, reward, done, truncated, info = env.step(read_integer())
+        observation_, reward, done, truncated, info = env.step(env.get_heuristic_action())
         #print(reward)
         # print(env.state.remaining)
         env.render()
