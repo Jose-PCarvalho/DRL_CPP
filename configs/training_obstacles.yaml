@@ -64,10 +64,10 @@ env5:
   sensor: "full information"
   sensor_range: 2
   size: 25
-  min_size: 15
+  min_size: 10
   random_size: true
   obstacles_random: true
-  number_obstacles: 40
+  number_obstacles: 30
   starting_position: [19,0]
   starting_position_corner : false
   starting_position_random : true

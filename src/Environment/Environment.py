@@ -7,7 +7,7 @@ from src.Environment.State import *
 from src.Environment.Actions import *
 from src.Environment.Vizualization import *
 import tqdm
-
+import copy
 
 class EnvironmentParams:
     def __init__(self, args):
@@ -45,7 +45,7 @@ class Environment:
             else:
                 self.state.init_episode()
                 if training:
-                    self.interesting_states.append(self.state)
+                    self.interesting_states.append(copy.deepcopy(self.state))
 
         self.rewards.reset(self.state)
         self.remaining = self.state.remaining
