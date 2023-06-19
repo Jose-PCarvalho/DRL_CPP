@@ -1,29 +1,3 @@
-import itertools
-
-from src.Environment.Environment import *
-from src.Environment.Vizualization import *
-from src.Environment.BackAndForth import *
-import random
-import yaml
-import time
-with open('../configs/training_test.yaml', 'rb') as f:
-    conf = yaml.safe_load(f.read())    # load the config file
-
-env = Environment(EnvironmentParams(conf['env1']))
-Viz = Vizualization()
-agent = BackForth()
-while True:
-    observation, _ = env.reset()
-    #env.render()
-    Viz.render(env.state.local_map, env.state.position)
-    agent.init(observation[0][-1],env.state.params.real_size)
-    for t in itertools.count():
-        action = agent.select_action(observation[0][-1])
-        observation_, reward, done, truncated, info = env.step(action.value)
-        #print(action)
-        # print(env.state.remaining)
-        #env.render()
-        Viz.render(env.state.local_map,env.state.position)
-        observation = observation_
-        if done or truncated:
-            break
+version https://git-lfs.github.com/spec/v1
+oid sha256:2c947e013d853ff456a2dc335328a6b0c5e734f957a2149ae1b1600c86d752b9
+size 967

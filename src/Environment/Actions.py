@@ -1,17 +1,3 @@
-from enum import Enum
-
-
-class Actions(Enum):
-    NORTH = 0
-    SOUTH = 1
-    WEST = 2
-    EAST = 3
-
-
-class Events(Enum):
-    BLOCKED = 0
-    NEW = 1
-    REPEATED = 2
-    FINISHED = 3
-    TIMEOUT = 4
-
+version https://git-lfs.github.com/spec/v1
+oid sha256:59a852ae16a4e358a5f5ecb98a0d4029e9b7b5515a82ae3f10425d4e301c6d6d
+size 217
