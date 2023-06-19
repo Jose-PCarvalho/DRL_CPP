@@ -1,0 +1,8 @@
+training_full_info_25_to_10_random_cov.pth filter=lfs diff=lfs merge=lfs -text
+training_full_info_30_random_cov.pth filter=lfs diff=lfs merge=lfs -text
+eval_full_info_15.pth filter=lfs diff=lfs merge=lfs -text
+eval_full_info_20.pth filter=lfs diff=lfs merge=lfs -text
+eval_full_info_25.pth filter=lfs diff=lfs merge=lfs -text
+eval_full_info_5.pth filter=lfs diff=lfs merge=lfs -text
+training_full_info_15_random_cov.pth filter=lfs diff=lfs merge=lfs -text
+training_full_info_19_random_cov.pth filter=lfs diff=lfs merge=lfs -text
